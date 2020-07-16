@@ -1,10 +1,10 @@
 import java.sql.*;
 
 public class Roster {
-    private static String driver = "com.mysql.cj.jdbc.Driver";
-    private static String connection = "jdbc:mysql://localhost:3306/demo?serverTimezone=UTC";
-    private static String user = "root"; // 'root' is default username
-    private static String password = "root"; // 'root' is default password
+    private static final String driver = "com.mysql.cj.jdbc.Driver";
+    private static final String connection = "jdbc:mysql://localhost:3306/demo?serverTimezone=UTC";
+    private static final String user = "root"; // 'root' is default username
+    private static final String password = "root"; // 'root' is default password
     private static Connection con = null;
     private static Statement state = null;
     private static ResultSet result;
@@ -22,7 +22,7 @@ public class Roster {
         if (waitlist_remaining < 0) return "Attribute remaining waitlist is null";
         // Connect to DB: Return error message if connection failed
         String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
+        if ( !error.equals("Successfully connected to database.") ) return error;
         // Attempt to insert
         try {
             // using PreparedStatement
@@ -36,7 +36,7 @@ public class Roster {
             pstate.executeUpdate(); // int value = pstate.executeUpdate();
             // Close connection
             error = closeConnection();
-            if (error != "Database closed successfully.") return error; // If error, return error
+            if ( !error.equals("Database closed successfully.") ) return error; // If error, return error
             return "Successfully inserted course: '" + crn + "' into roster";
         } catch (SQLException e) {
             return "Query error";
@@ -49,7 +49,7 @@ public class Roster {
         if (crn == null) return "Attribute course number is null";
         // Connect to DB: Return error message if connection failed
         String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
+        if ( !error.equals("Successfully connected to database.") ) return error;
         // Attempt to delete
         try {
             // using PreparedStatement
@@ -57,14 +57,14 @@ public class Roster {
             pstate.setString(1, "crn");
             pstate.executeUpdate(); // int value = pstate.executeUpdate();
             error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
+            if ( !error.equals("Database closed successfully.") ) return error; // If error, return error
             return "Successfully deleted course '" + crn + "' from roster";
         } catch (SQLException e) {
             return "Query error.";
         }
     }
 
-    // Update (name of course)
+    // Update (course number, total seats, seats left, total waitlist, remaining waitlist)
     public static String update(String crn, int total_seats, int seats_remaining, int total_waitlist, int waitlist_remaining) {
         // Check for errors in input and return errors to caller
         if (crn == null) return "Attribute course number is null";
@@ -74,11 +74,11 @@ public class Roster {
         if (waitlist_remaining < 0) return "Attribute remaining waitlist is null";
         // Connect to DB: Return error message if connection failed
         String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
+        if ( !error.equals("Successfully connected to database.") ) return error;
         // Attempt to insert
         try {
             // using PreparedStatement
-            pstate = con.prepareStatement("INSERT INTO Roster(crn, total_seats, seats_remaining, total_waitlist, waitlist_remaining)"
+            pstate = con.prepareStatement("UPDATE Roster(crn, total_seats, seats_remaining, total_waitlist, waitlist_remaining)"
                     + "values(?, ?, ?)");
             pstate.setString(1, crn);
             pstate.setInt(2, total_seats);
@@ -87,58 +87,64 @@ public class Roster {
             pstate.setInt(5, waitlist_remaining);
             pstate.executeUpdate(); // int value = pstate.executeUpdate();
             error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully updated course: '" + crn + "' in roster";
+            if ( !error.equals("Database closed successfully.") ) return error; // If error, return error
+            return "Successfully updated course roster: '" + crn;
         } catch (SQLException e) {
             return "Query error";
         }
     }
 
     // Search
-    public static String search(String department, String number, String name) {
+    public static String search(String crn, int total_seats, int seats_remaining, int total_waitlist, int waitlist_remaining) {
         String error = mysqlConnect(); // Connect to DB: Return error message if connection failed
-        if (error != "Successfully connected to database.") return error;
+        if ( !error.equals("Successfully connected to database.") ) return error;
         try {
-            searchHelper(department, number, name);
+            searchHelper(crn, total_seats, seats_remaining, total_waitlist, waitlist_remaining);
             int value = pstate.executeUpdate();
             error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully updated course to: " + department + " " + number + " " + " " + name;
+            if ( !error.equals("Database closed successfully.") ) return error; // If error, return error
+            return "Successfully updated course '" + crn + "' roster to: "
+                    + total_seats + " " + seats_remaining + " " + total_waitlist + " " + waitlist_remaining;
         } catch (SQLException e) {
             return "Query error";
         }
     }
 
-    private static void searchHelper(String department, String number, String name) throws SQLException {
-        if (department != null && number != null && name != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE department = ? AND number = ? AND name = ?");
-            pstate.setString(1, department);
-            pstate.setString(2, number);
-            pstate.setString(3, name);
-        } else if (department != null && number != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE department = ? AND number = ?");
-            pstate.setString(1, department);
-            pstate.setString(2, number);
-        } else if (number != null && name != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE number = ? AND name = ?");
-            pstate.setString(1, number);
-            pstate.setString(2, name);
-        } else if (department != null && name != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE department = ? AND name = ?");
-            pstate.setString(1, department);
-            pstate.setString(2, name);
-        } else if (department != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE department = ?");
-            pstate.setString(1, department);
-        } else if (number != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE number = ?");
-            pstate.setString(1, number);
-        } else if (name != null) {
-            pstate = con.prepareStatement("SELECT * FROM Courses WHERE name = ?");
-            pstate.setString(1, name);
-        } else { // If all 3 fields are null, return all entries
-            pstate = con.prepareStatement("SELECT * FROM Courses");
+    private static void searchHelper(String crn, int total_seats, int seats_remaining, int total_waitlist, int waitlist_remaining) throws SQLException {
+        Object arr[] = new Object[5];
+        int index = 0;
+        String sqlStatement = "SELECT * FROM WHERE ";
+        if (crn != null) {
+            sqlStatement += "crn = ?";
+            arr[index] = crn;
+            index++;
+        } if (total_seats >= 0) {
+            sqlStatement += "total_seats = ?";
+            arr[index] = total_seats;
+            index++;
+        } if (seats_remaining >= 0) {
+            sqlStatement += "seats_remaining = ?";
+            arr[index] = seats_remaining;
+            index++;
+        } if (total_waitlist >= 0) {
+            sqlStatement += "total_waitlist = ?";
+            arr[index] = total_waitlist;
+            index++;
+        } if (waitlist_remaining >= 0) {
+            sqlStatement += "waitlist_remaining = ?";
+            arr[index] = waitlist_remaining;
+            index++;
+        } index = 0;
+        pstate = con.prepareStatement(sqlStatement);
+        while (index < 5 && arr[index] != null) {
+            if(arr[index] instanceof String) {
+                pstate.setString(index+1, (String) arr[index]);
+            } else {
+                pstate.setInt(index+1, (Integer) arr[index]);
+            }
+            index++;
         }
+
     }
 
     private static String mysqlConnect() {
