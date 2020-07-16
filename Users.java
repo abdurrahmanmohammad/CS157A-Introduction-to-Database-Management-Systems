@@ -10,6 +10,13 @@ public class Users {
     private static Statement state = null;
     private static ResultSet result;
     private static PreparedStatement pstate;
+    
+    public static boolean login(String user, String password) {
+        String Usrpassword = search(String user);
+        if(password == Usrpassword) return true;
+        else return false;
+        
+    }
 
     // Insert
     //        Users: username password email         timestamp
