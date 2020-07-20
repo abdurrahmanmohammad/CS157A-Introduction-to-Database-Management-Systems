@@ -14,11 +14,11 @@ public class Administrator {
 	public static void createRoster() {
 	}
 
-	public static String deleteUser(String department, String number) {
+	public static String deleteCourse(String department, String number) {
 		return Courses.delete(department, number);
 
 	}
-	public static String updateStudent(String department, String number, String name) {
+	public static String updateCourse(String department, String number, String name) {
 		return Courses.update(department, number, name);
 
 	}
