@@ -1,173 +1,188 @@
-import java.sql.*;
+package users;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+// import java.sql.Statement;
+
+// Users(ID, username, password)
 public class Users {
+	private static String driver = "com.mysql.cj.jdbc.Driver";
+	private static String connection = "jdbc:mysql://localhost:3306/demo?serverTimezone=UTC";
+	private static String user = "root"; // 'root' is default username
+	private static String password = "root"; // 'root' is default password
+	private static Connection con = null;
+	// private static Statement state = null;
+	private static ResultSet result;
+	private static PreparedStatement pstate;
 
-    private static String driver = "com.mysql.cj.jdbc.Driver";
-    private static String connection = "jdbc:mysql://localhost:3306/demo?serverTimezone=UTC";
-    private static String user = "root"; // 'root' is default username
-    private static String password = "root"; // 'root' is default password
-    private static Connection con = null;
-    private static Statement state = null;
-    private static ResultSet result;
-    private static PreparedStatement pstate;
-    
-    public static boolean login(String user, String password) {
-        String Usrpassword = search(String user);
-        if(password == Usrpassword) return true;
-        else return false;
-        
-    }
+	public static boolean authenticate(String username, String password) {
+		mysqlConnect(); // Connect to DB
+		try {
+			pstate = con.prepareStatement("SELECT * FROM Users WHERE username = ?");
+			pstate.setString(1, username); // Usernames are unique
+			result = pstate.executeQuery(); // ResultSet result = pstate.executeQuery();
+			result.next();
+			String userPswd = result.getString("password"); // Retrieve password from result
+			result.close(); // Close result
+			closeConnection(); // Close connection to DB
+			if (userPswd.equals(password))
+				return true; // Return true if passwords match
+			else
+				return false; // Return false if passwords do not match
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error."); // Print error and exit
+		} catch (NullPointerException e) {
+			mysql_fatal_error(e.toString()); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
 
-    // Insert
-    //        Users: username password email         timestamp
-    //Example Users: bob21    happy    bob@gmail.com NULL
-    // Primary key: (username)
-    public static String insert(String username, String password, String email, String timestamp) {
-        // Check for errors in input and return errors to caller
-        if (username == null) return "Attribute username is null";
-        if (password == null) return "Attribute password is null";
-        if (email == null) return "Attribute email is null";
-        if (timestamp == null) return "Attribute timestamp is null";
+	public static int getType(String username) {
+		mysqlConnect(); // Connect to DB
+		try {
+			// Check if user is an administrator
+			pstate = con.prepareStatement(
+					"SELECT COUNT(*) FROM Administrators WHERE Users.username = ? AND Administrators.ID = Users.ID");
+			pstate.setString(1, username); // Sanitize input
+			result = pstate.executeQuery(); // Execute query
+			result.next();
+			int rowcount = result.getInt(1); // Get row count
+			result.close(); // Close result
+			if (rowcount == 1) return 1; // User is an administrator
 
-        // Connect to DB: Return error message if connection failed
-        String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
-        // Attempt to insert
-        try {
-            // using PreparedStatement
-            pstate = con.prepareStatement("INSERT INTO Users(username, password, email, timestamp)" + "values(?, ?, ?, ?)");
-            pstate.setString(1, username);
-            pstate.setString(2, password);
-            pstate.setString(3, email);
-            pstate.setString(4, timestamp);
-            pstate.executeUpdate(); // int value = pstate.executeUpdate();
-            // Close connection
-            error = closeConnection();
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully inserted user: " + username + " " + password + " " + " " + email + " " + timestamp;
-        } catch (SQLException e) {
-            return "Query error";
-        }
-    }
+			// Check if user is an instructor
+			pstate.setString(1, username); // Sanitize input
+			result = pstate.executeQuery(); // Execute query
+			result.next();
+			rowcount = result.getInt(1); // Get row count
+			result.close(); // Close result
+			if (rowcount == 1) return 2; // User is an instructor
 
-    // Delete
-    public static String delete(String username, String password) {
-        // Check for errors in input and return errors to caller
-        if (username == null) return "Attribute username is null";
-        if (password == null) return "Attribute password is null";
-        // Connect to DB: Return error message if connection failed
-        String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
-        // Attempt to delete
-        try {
-            // using PreparedStatement
-            pstate = con.prepareStatement("DELETE FROM Users WHERE username = ? AND password = ?");
-            pstate.setString(1, "username");
-            pstate.setString(2, "password");
-            pstate.executeUpdate(); // int value = pstate.executeUpdate();
-            error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully deleted user: " + username + " " + password + " ";
-        } catch (SQLException e) {
-            return "Query error.";
-        }
-    }
+			// Check if user is a student
+			pstate.setString(1, username); // Sanitize input
+			result = pstate.executeQuery(); // Execute query
+			result.next();
+			rowcount = result.getInt(1); // Get row count
+			result.close(); // Close result
+			if (rowcount == 1) return 3; // User is an instructor
 
-    // Update (name of course)
-    public static String update(String username, String password, String email) {
-        // Check for errors in input and return errors to caller
-        if (username == null) return "Attribute username is null";
-        if (password == null) return "Attribute password is null";
-        if (email == null) return "Attribute email is null";
-        // Connect to DB: Return error message if connection failed
-        String error = mysqlConnect();
-        if (error != "Successfully connected to database.") return error;
-        // Attempt to insert
-        try {
-            // using PreparedStatement
-            pstate = con.prepareStatement("UPDATE Users SET name = ? WHERE username = ? AND password = ?");
-            pstate.setString(1, email);
-            pstate.setString(2, username);
-            pstate.setString(3, password);
-            pstate.executeUpdate(); // int value = pstate.executeUpdate();
-            error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully updated course to: " + username + " " + password + " " + " " + email;
-        } catch (SQLException e) {
-            return "Query error";
-        }
-    }
+			result.close(); // Close result
+			closeConnection(); // Close connection to DB
 
-    // Search
-    public static String search(String username, String password, String name) {
-        String error = mysqlConnect(); // Connect to DB: Return error message if connection failed
-        if (error != "Successfully connected to database.") return error;
-        try {
-            searchHelper(username, password, name);
-            int value = pstate.executeUpdate();
-            error = closeConnection(); // Close connection
-            if (error != "Database closed successfully.") return error; // If error, return error
-            return "Successfully updated course to: " + username + " " + password + " " + " " + name;
-        } catch (SQLException e) {
-            return "Query error";
-        }
-    }
+			return 0; // If username is in none of these tables, it does not exist
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error."); // Print error and exit
+		} catch (NullPointerException e) {
+			mysql_fatal_error(e.toString()); // Print error and exit
+		}
+		return 0; // Return 0 as a default value
+	}
 
-    private static void searchHelper(String username, String password, String email) throws SQLException {
-        if (username != null && password != null && email != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE username = ? AND password = ? AND name = ?");
-            pstate.setString(1, username);
-            pstate.setString(2, password);
-            pstate.setString(3, email);
-        } else if (username != null && password != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE username = ? AND password = ?");
-            pstate.setString(1, username);
-            pstate.setString(2, password);
-        } else if (password != null && email != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE number = ? AND name = ?");
-            pstate.setString(1, password);
-            pstate.setString(2, email);
-        } else if (username != null && email!= null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE username = ? AND name = ?");
-            pstate.setString(1, username);
-            pstate.setString(2, email);
-        } else if (username != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE username = ?");
-            pstate.setString(1, username);
-        } else if (password != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE password = ?");
-            pstate.setString(1, password);
-        } else if (email != null) {
-            pstate = con.prepareStatement("SELECT * FROM Users WHERE name = ?");
-            pstate.setString(1, email);
-        } else { // If all 3 fields are null, return all entries
-            pstate = con.prepareStatement("SELECT * FROM Users");
-        }
-    }
+	/**
+	 * Method to create and insert a user in the DB. Returns true if successful,
+	 * otherwise false.
+	 */
+	public static boolean insert(String ID, String username, String password) {
+		// Check if inputs are null
+		if (ID == null) return false; // Attribute ID is null
+		if (username == null) return false; // Attribute username is null
+		if (password == null) return false; // Attribute password is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to insert
+			pstate = con.prepareStatement("INSERT INTO Users(ID, username, password)" + "values(?, ?, ?)");
+			pstate.setString(1, ID);
+			pstate.setString(2, username);
+			pstate.setString(3, password);
+			int value = pstate.executeUpdate();
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error");
+		}
+		return false; // Return false as a default value
+	}
 
-    private static String mysqlConnect() {
-        try {
-            Class.forName(driver);
-            con = DriverManager.getConnection(connection, user, password);
-            return "Successfully connected to database.";
-        } catch (ClassNotFoundException e) {
-            return "Couldn't load driver.";
-        } catch (SQLException e) {
-            return "Couldn't connect to database.";
-        }
-    }
+	/**
+	 * Method to delete a user using ID. Returns true if successful, otherwise
+	 * false.
+	 */
+	public static boolean delete(String ID) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to delete
+			pstate = con.prepareStatement("DELETE FROM Users WHERE ID = ?");
+			pstate.setString(1, ID);
+			int value = pstate.executeUpdate();
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error");
+		}
+		return false; // Return false as a default value
+	}
 
-    private static String closeConnection() {
-        try {
-            if (!con.isClosed()) {
-                con.close();
-                return "Database closed successfully.";
-            }
-        } catch (NullPointerException e) {
-            return "Couldn't load driver.";
-        } catch (SQLException e) {
-            return "Couldn't close database.";
-        }
-        return "Database closed successfully."; // If database was closed successfully
-    }
+	public static boolean changeUsername(String ID, String username) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET username = ? WHERE ID = ?");
+			pstate.setString(1, username); // New username
+			pstate.setString(2, ID); // ID of user
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
+
+	public static boolean changePassword(String ID, String password) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET password = ? WHERE ID = ?");
+			pstate.setString(1, password); // New password
+			pstate.setString(2, ID); // ID of user
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
+
+	/** Attempts to connect to DB. Exits if error. */
+	private static void mysqlConnect() {
+		try {
+			Class.forName(driver);
+			con = DriverManager.getConnection(connection, user, password); // Successfully connected to database
+		} catch (ClassNotFoundException e) {
+			mysql_fatal_error("Couldn't load driver."); // Print error and exit
+		} catch (SQLException e) {
+			mysql_fatal_error("Couldn't connect to database."); // Print error and exit
+		}
+	}
+
+	/** Close connection to DB */
+	private static void closeConnection() {
+		try {
+			if (!con.isClosed()) con.close(); // Database closed successfully.
+		} catch (NullPointerException e) {
+			mysql_fatal_error("Couldn't load driver."); // Print error and exit
+		} catch (SQLException e) {
+			mysql_fatal_error("Couldn't close database."); // Print error and exit
+		}
+	}
+
+	/** Customized error function */
+	public static void mysql_fatal_error(String error) {
+		System.out.println(error); // We want to print this to the browser
+		System.exit(1); // Exit with error
+	}
+
 }
