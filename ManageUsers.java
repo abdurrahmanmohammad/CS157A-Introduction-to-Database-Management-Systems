@@ -35,7 +35,7 @@ public class ManageUsers extends HttpServlet {
 			// !!!!!!!!!! Must create a Member first and link with User !!!!!!!!!!
 			String ID = request.getParameter("createUserID"); // Get User's ID
 			String username = request.getParameter("createUserUsername"); // Get User's username
-			String password = request.getParameter("createUserID"); // Get User's password
+			String password = request.getParameter("createUserPassword"); // Get User's password
 			if (ID.isEmpty() || username.isEmpty() || password.isEmpty()) { // If a field is empty
 				RequestDispatcher req = request.getRequestDispatcher("AdministratorPortal.jsp");
 				req.include(request, response); // Redirect to admin portal
