@@ -14,21 +14,25 @@ public class Courses {
 	// Insert
 	// Example Course: CS 157A Introduction to Database Management Systems
 	// Primary key: (department, number)
-	public static String insert(String department, String number, String name) {
+	public static String insert(String department, String number, String name, String units, String cost) {
 		// Check for errors in input and return errors to caller
 		if (department == null) return "Attribute department is null";
 		if (number == null) return "Attribute number is null";
 		if (name == null) return "Attribute name is null";
+		if (units == null) return "Units not given";
+		if (cost == null) return "Cost not given";
 		// Connect to DB: Return error message if connection failed
 		String error = mysqlConnect();
 		if (error != "Successfully connected to database.") return error;
 		// Attempt to insert
 		try {
 			// using PreparedStatement
-			pstate = con.prepareStatement("INSERT INTO Courses(department, number, name)" + "values(?, ?, ?)");
+			pstate = con.prepareStatement("INSERT INTO Courses(department, number, name, units, cost)" + "values(?, ?, ?)");
 			pstate.setString(1, department);
 			pstate.setString(2, number);
 			pstate.setString(3, name);
+			pstate.setString(4, units);
+			pstate.setString(5, cost);
 			pstate.executeUpdate(); // int value = pstate.executeUpdate();
 			// Close connection
 			error = closeConnection();
@@ -40,50 +44,23 @@ public class Courses {
 	}
 
 	// Delete
-	public static String delete(String department, String number) {
+	public static String delete(String ID) {
 		// Check for errors in input and return errors to caller
-		if (department == null) return "Attribute department is null";
-		if (number == null) return "Attribute number is null";
+		if (ID == null) return "ID not given";
 		// Connect to DB: Return error message if connection failed
 		String error = mysqlConnect();
 		if (error != "Successfully connected to database.") return error;
 		// Attempt to delete
 		try {
 			// using PreparedStatement
-			pstate = con.prepareStatement("DELETE FROM Courses WHERE department = ? AND number = ?");
-			pstate.setString(1, "department");
-			pstate.setString(2, "number");
+			pstate = con.prepareStatement("DELETE FROM Courses WHERE ID = ?");
+			pstate.setString(1, "ID");
 			pstate.executeUpdate(); // int value = pstate.executeUpdate();
 			error = closeConnection(); // Close connection
 			if (error != "Database closed successfully.") return error; // If error, return error
-			return "Successfully deleted course: " + department + " " + number + " ";
+			return "Successfully deleted course: " + ID;
 		} catch (SQLException e) {
 			return "Query error.";
-		}
-	}
-
-	// Update (name of course)
-	public static String update(String department, String number, String name) {
-		// Check for errors in input and return errors to caller
-		if (department == null) return "Attribute department is null";
-		if (number == null) return "Attribute number is null";
-		if (name == null) return "Attribute name is null";
-		// Connect to DB: Return error message if connection failed
-		String error = mysqlConnect();
-		if (error != "Successfully connected to database.") return error;
-		// Attempt to insert
-		try {
-			// using PreparedStatement
-			pstate = con.prepareStatement("UPDATE Courses SET name = ? WHERE department = ? AND number = ?");
-			pstate.setString(1, name);
-			pstate.setString(2, department);
-			pstate.setString(3, number);
-			pstate.executeUpdate(); // int value = pstate.executeUpdate();
-			error = closeConnection(); // Close connection
-			if (error != "Database closed successfully.") return error; // If error, return error
-			return "Successfully updated course to: " + department + " " + number + " " + " " + name;
-		} catch (SQLException e) {
-			return "Query error";
 		}
 	}
 
