@@ -36,9 +36,16 @@ public class Administrator {
 		return Courses.updateName(ID, name);
 	}
 
-	public static String updateInstructor(String ID, String username, String password, String email) {
-		return Users.update(ID, username, password, email);
+	public static boolean updateInstructorUserName(String ID, String username) {
+		return Users.updateUserName(ID, username);
+	}
 
+	public static boolean updateInstructorPassword(String ID, String password) {
+		return Users.updatePassword(ID, password);
+	}
+
+	public static boolean updateInstructorEmail(String ID, String email) {
+		return Users.updateEmail(ID, email);
 	}
 
 //	public static String deleteAdministrator(String username, String password) {
