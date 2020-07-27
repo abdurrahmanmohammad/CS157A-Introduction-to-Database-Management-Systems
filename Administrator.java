@@ -20,10 +20,6 @@ public class Administrator {
 
 	}
 
-//	public static String updateCourse(String ID, String department, String number, String name) {
-//		return Courses.update(ID, department, number, name);
-//
-//	}
 	public static String updateCourseDept(String ID, String department) {
 		return Courses.updateDept(ID, department);
 	}
@@ -48,10 +44,6 @@ public class Administrator {
 		return Users.updateEmail(ID, email);
 	}
 
-//	public static String deleteAdministrator(String username, String password) {
-//		return Users.delete(username, password);
-//
-//	}
 	public static boolean deleteAdmin(String ID) {
 		return Users.delete(ID);
 	}
