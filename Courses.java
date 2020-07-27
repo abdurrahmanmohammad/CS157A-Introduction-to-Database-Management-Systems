@@ -142,7 +142,7 @@ public class Courses {
 		}
 	}
 
-	private static void searchHelper(String department, String number, String name) throws SQLException {
+	public static void searchHelper(String department, String number, String name) throws SQLException {
 		if (department != null && number != null && name != null) {
 			pstate = con.prepareStatement("SELECT * FROM Courses WHERE department = ? AND number = ? AND name = ?");
 			pstate.setString(1, department);
@@ -174,7 +174,7 @@ public class Courses {
 		}
 	}
 
-	private static String mysqlConnect() {
+	public static String mysqlConnect() {
 		try {
 			Class.forName(driver);
 			con = DriverManager.getConnection(connection, user, password);
@@ -182,11 +182,11 @@ public class Courses {
 		} catch (ClassNotFoundException e) {
 			return "Couldn't load driver.";
 		} catch (SQLException e) {
-			return "Couldn't connect to database.";
+			return "***Print this*** Couldn't connect to database.";
 		}
 	}
 
-	private static String closeConnection() {
+	public static String closeConnection() {
 		try {
 			if (!con.isClosed()) {
 				con.close();
@@ -198,5 +198,9 @@ public class Courses {
 			return "Couldn't close database.";
 		}
 		return "Database closed successfully."; // If database was closed successfully
+	}
+
+	public static PreparedStatement getPstate() {
+		return pstate;
 	}
 }
