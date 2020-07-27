@@ -1,4 +1,4 @@
-package users;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -85,14 +85,14 @@ public class Users {
 	 * Method to create and insert a user in the DB. Returns true if successful,
 	 * otherwise false.
 	 */
-	public static boolean insert(String ID, String username, String password) {
+	public static boolean insert(String username, String password) {
 		// Check if inputs are null
-		if (ID == null) return false; // Attribute ID is null
 		if (username == null) return false; // Attribute username is null
 		if (password == null) return false; // Attribute password is null
 		mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
 			pstate = con.prepareStatement("INSERT INTO Users(ID, username, password)" + "values(?, ?, ?)");
+			String ID = (int) ( (Math.random() * ((999999999 - 100000000) + 1)) + 100000000 ) + "";
 			pstate.setString(1, ID);
 			pstate.setString(2, username);
 			pstate.setString(3, password);
@@ -103,6 +103,23 @@ public class Users {
 			mysql_fatal_error("Query error");
 		}
 		return false; // Return false as a default value
+	}
+
+	public static String update(String ID, String username, String password, String email) {
+		if (ID == null) return "ID is invalid"; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET username = ?, password = ?, email = ? WHERE ID = ?");
+			pstate.setString(1, username); // New username
+			pstate.setString(2, password); // New password
+			pstate.setString(3, email); // New email
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return "Successfully updated user"; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return "Query error"; // Return false as a default value
 	}
 
 	/**
@@ -124,37 +141,37 @@ public class Users {
 		return false; // Return false as a default value
 	}
 
-	public static boolean changeUsername(String ID, String username) {
-		if (ID == null) return false; // Check if ID is null
-		mysqlConnect(); // Connect to DB
-		try { // Attempt to update
-			pstate = con.prepareStatement("UPDATE Users SET username = ? WHERE ID = ?");
-			pstate.setString(1, username); // New username
-			pstate.setString(2, ID); // ID of user
-			int value = pstate.executeUpdate(); // Execute statement
-			closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			mysql_fatal_error("Query error"); // Print error and exit
-		}
-		return false; // Return false as a default value
-	}
+//	private static boolean changeUsername(String ID, String username) {
+//		if (ID == null) return false; // Check if ID is null
+//		mysqlConnect(); // Connect to DB
+//		try { // Attempt to update
+//			pstate = con.prepareStatement("UPDATE Users SET username = ? WHERE ID = ?");
+//			pstate.setString(1, username); // New username
+//			pstate.setString(2, ID); // ID of user
+//			int value = pstate.executeUpdate(); // Execute statement
+//			closeConnection(); // Close connection
+//			return true; // Success
+//		} catch (SQLException e) {
+//			mysql_fatal_error("Query error"); // Print error and exit
+//		}
+//		return false; // Return false as a default value
+//	}
 
-	public static boolean changePassword(String ID, String password) {
-		if (ID == null) return false; // Check if ID is null
-		mysqlConnect(); // Connect to DB
-		try { // Attempt to update
-			pstate = con.prepareStatement("UPDATE Users SET password = ? WHERE ID = ?");
-			pstate.setString(1, password); // New password
-			pstate.setString(2, ID); // ID of user
-			int value = pstate.executeUpdate(); // Execute statement
-			closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			mysql_fatal_error("Query error"); // Print error and exit
-		}
-		return false; // Return false as a default value
-	}
+//	public static boolean changePassword(String ID, String password) {
+//		if (ID == null) return false; // Check if ID is null
+//		mysqlConnect(); // Connect to DB
+//		try { // Attempt to update
+//			pstate = con.prepareStatement("UPDATE Users SET password = ? WHERE ID = ?");
+//			pstate.setString(1, password); // New password
+//			pstate.setString(2, ID); // ID of user
+//			int value = pstate.executeUpdate(); // Execute statement
+//			closeConnection(); // Close connection
+//			return true; // Success
+//		} catch (SQLException e) {
+//			mysql_fatal_error("Query error"); // Print error and exit
+//		}
+//		return false; // Return false as a default value
+//	}
 
 	/** Attempts to connect to DB. Exits if error. */
 	private static void mysqlConnect() {
