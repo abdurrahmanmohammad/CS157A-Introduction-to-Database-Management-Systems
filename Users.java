@@ -105,23 +105,6 @@ public class Users {
 		return false; // Return false as a default value
 	}
 
-	public static String update(String ID, String username, String password, String email) {
-		if (ID == null) return "ID is invalid"; // Check if ID is null
-		mysqlConnect(); // Connect to DB
-		try { // Attempt to update
-			pstate = con.prepareStatement("UPDATE Users SET username = ?, password = ?, email = ? WHERE ID = ?");
-			pstate.setString(1, username); // New username
-			pstate.setString(2, password); // New password
-			pstate.setString(3, email); // New email
-			int value = pstate.executeUpdate(); // Execute statement
-			closeConnection(); // Close connection
-			return "Successfully updated user"; // Success
-		} catch (SQLException e) {
-			mysql_fatal_error("Query error"); // Print error and exit
-		}
-		return "Query error"; // Return false as a default value
-	}
-
 	/**
 	 * Method to delete a user using ID. Returns true if successful, otherwise
 	 * false.
@@ -141,37 +124,53 @@ public class Users {
 		return false; // Return false as a default value
 	}
 
-//	private static boolean changeUsername(String ID, String username) {
-//		if (ID == null) return false; // Check if ID is null
-//		mysqlConnect(); // Connect to DB
-//		try { // Attempt to update
-//			pstate = con.prepareStatement("UPDATE Users SET username = ? WHERE ID = ?");
-//			pstate.setString(1, username); // New username
-//			pstate.setString(2, ID); // ID of user
-//			int value = pstate.executeUpdate(); // Execute statement
-//			closeConnection(); // Close connection
-//			return true; // Success
-//		} catch (SQLException e) {
-//			mysql_fatal_error("Query error"); // Print error and exit
-//		}
-//		return false; // Return false as a default value
-//	}
+	public static boolean updateUserName(String ID, String username) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET username = ? WHERE ID = ?");
+			pstate.setString(1, username); // New username
+			pstate.setString(2, ID); // ID of user
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
 
-//	public static boolean changePassword(String ID, String password) {
-//		if (ID == null) return false; // Check if ID is null
-//		mysqlConnect(); // Connect to DB
-//		try { // Attempt to update
-//			pstate = con.prepareStatement("UPDATE Users SET password = ? WHERE ID = ?");
-//			pstate.setString(1, password); // New password
-//			pstate.setString(2, ID); // ID of user
-//			int value = pstate.executeUpdate(); // Execute statement
-//			closeConnection(); // Close connection
-//			return true; // Success
-//		} catch (SQLException e) {
-//			mysql_fatal_error("Query error"); // Print error and exit
-//		}
-//		return false; // Return false as a default value
-//	}
+	public static boolean updatePassword(String ID, String password) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET password = ? WHERE ID = ?");
+			pstate.setString(1, password); // New password
+			pstate.setString(2, ID); // ID of user
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
+
+	public static boolean updateEmail(String ID, String email) {
+		if (ID == null) return false; // Check if ID is null
+		mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = con.prepareStatement("UPDATE Users SET email = ? WHERE ID = ?");
+			pstate.setString(1, email); // New password
+			pstate.setString(2, ID); // ID of user
+			int value = pstate.executeUpdate(); // Execute statement
+			closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return false; // Return false as a default value
+	}
 
 	/** Attempts to connect to DB. Exits if error. */
 	private static void mysqlConnect() {
