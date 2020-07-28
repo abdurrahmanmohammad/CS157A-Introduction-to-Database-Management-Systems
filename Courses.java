@@ -1,18 +1,17 @@
-package courses;
+//package courses;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import SQL.SQLMethods;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import SQL.SQLMethods;
-
 public class Courses {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
+
+	private static ArrayList<String> generatedIDs = new ArrayList<>();
 
 	// Insert
 	// Example Course: CS 157A Introduction to Database Management Systems
@@ -28,12 +27,17 @@ public class Courses {
 		try { // Attempt to insert
 				// using PreparedStatement
 			pstate = SQLMethods.con.prepareStatement(
-					"INSERT INTO Courses(department, number, title, units, cost)" + "values(?, ?, ?, ?, ?)");
-			pstate.setString(1, department);
-			pstate.setString(2, number);
-			pstate.setString(3, title);
-			pstate.setString(4, units);
-			pstate.setString(5, cost);
+					"INSERT INTO Courses(ID, department, number, title, units, cost)" + "values(?, ?, ?, ?, ?, ?)");
+			String ID = (int) ( (Math.random() * ((999999999 - 100000000) + 1)) + 100000000 ) + "";
+			while (!generatedIDs.isEmpty() && generatedIDs.contains(ID) ) {
+				ID = (int) ( (Math.random() * ((999999999 - 100000000) + 1)) + 100000000 ) + "";
+			} generatedIDs.add(ID);
+			pstate.setString(1, ID);
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setString(4, title);
+			pstate.setString(5, units);
+			pstate.setString(6, cost);
 			int value = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Success
@@ -71,7 +75,7 @@ public class Courses {
 					.prepareStatement("UPDATE Courses SET department = ? WHERE department = ? AND number = ?");
 			pstate.setString(1, newDepartment);
 			pstate.setString(2, oldDepartment);
-			pstate.setString(2, newDepartment);
+			pstate.setString(3, number);
 			int value = pstate.executeUpdate(); // Execute statement
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Success
