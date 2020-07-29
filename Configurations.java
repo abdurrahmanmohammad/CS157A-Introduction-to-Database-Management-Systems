@@ -158,4 +158,35 @@ public class Configurations {
         }
         return false; // Return false as a default value
     }
+    
+    	// Search
+
+	public static ArrayList<ArrayList<String>> search(String ID) {
+		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
+		if (ID == null) return output; // Check if ID is null, return empty list if so
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT * Configurations WHERE ID = ?");
+			pstate.setString(1, ID);
+			result = pstate.executeQuery(); // Execute query
+			SQLMethods.closeConnection(); // Close connection
+			while (result.next()) {
+				ArrayList<String> tuple = new ArrayList<String>();
+                tuple.add(result.getString("ID"));
+				tuple.add(result.getString("term"));
+				tuple.add(result.getString("year"));
+				tuple.add(result.getString("days"));
+				tuple.add(result.getString("time"));
+				tuple.add(result.getString("room"));
+                tuple.add(result.getString("seats"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Success
+		} catch (SQLException e) {
+			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return output; // Return false as a default value
+	}
+
 }
