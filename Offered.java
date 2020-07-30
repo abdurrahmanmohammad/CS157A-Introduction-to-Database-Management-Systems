@@ -11,11 +11,17 @@ public class Offered {
 	private static PreparedStatement pstate;
 
 	
-	public static String insert(String department, String number, String term, String year, String start, String end, String days, String time) {
+	public static String insert(String department, String number, String name, String term, String year, String start, String end, String days, String time) {
 		// Check for errors in input and return errors to caller
 		if (department == null) return "Attribute department is null";
 		if (number == null) return "Attribute number is null";
 		if (name == null) return "Attribute name is null";
+		if (term == null) return "Course term not given";
+		if (year == null) return "Year not given";
+		if (start == null) return "Start date not given";
+		if (end == null) return "End date not given";
+		if (days == null) return "Meeting days not given";
+		if (time == null) return "Class time not given";
 		// Connect to DB: Return error message if connection failed
 		String error = mysqlConnect();
 		if (error != "Successfully connected to database.") return error;

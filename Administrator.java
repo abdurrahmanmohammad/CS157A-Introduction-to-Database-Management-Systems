@@ -6,7 +6,7 @@
 // Will provide built in security features such as hashing
 public class Administrator {
 
-	public static String createCourse(String department, String number, String name, String units, String cost) {
+	public static boolean createCourse(String department, String number, String name, String units, String cost) {
 		return Courses.insert(department, number, name, units, cost);
 
 	}
@@ -15,21 +15,21 @@ public class Administrator {
 
 	}
 
-	public static String deleteCourse(String ID) {
+	public static boolean deleteCourse(String ID) {
 		return Courses.delete(ID);
 
 	}
 
-	public static String updateCourseDept(String ID, String department) {
-		return Courses.updateDept(ID, department);
+	public static boolean updateCourseDept(String oldDepartment, String number, String newDepartment) {
+		return Courses.updateDepartment(oldDepartment, number, newDepartment);
 	}
 
-	public static String updateCourseNum(String ID, String number) {
-		return Courses.updateNum(ID, number);
+	public static boolean updateCourseNum(String department, String oldNumber, String newNumber) {
+		return Courses.updateNumber(department, oldNumber, newNumber);
 	}
 
-	public static String updateCourseName(String ID, String name) {
-		return Courses.updateName(ID, name);
+	public static boolean updateCourseName(String department, String number, String title) {
+		return Courses.updateTitle(department, number, title);
 	}
 
 	public static boolean updateInstructorUserName(String ID, String username) {
