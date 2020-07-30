@@ -1,5 +1,4 @@
-# CS157ATeam4
-Team 4
+# CS157A Team4
 
 All team members had committed to this repository. The code was initially unorganized. When this repository was synced with eclipse and then organized into folders, GitHub lost track of all changes, edits, and contributor names. I wanted to clarify that all team members have done their part of contributing to the project, even if their names and contribution may not appear on GitHub. I have discussed this with Professor Wu in class and he said that it's ok. 
 
