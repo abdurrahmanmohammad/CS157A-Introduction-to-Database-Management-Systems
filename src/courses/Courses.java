@@ -1,4 +1,4 @@
-//package courses;
+package courses;
 
 import SQL.SQLMethods;
 

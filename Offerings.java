@@ -1,4 +1,4 @@
-package offerings;
+/*package offerings;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,4 +56,4 @@ public class Offerings {
 		return false; // Return false as a default value
 	}
 
-}
+}*/

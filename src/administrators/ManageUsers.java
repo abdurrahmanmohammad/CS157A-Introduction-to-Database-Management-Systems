@@ -1,4 +1,4 @@
-package users;
+package administrators;
 
 import java.io.IOException;
 
@@ -8,7 +8,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import users.Users;
+import courses.Courses;
 /**
  * Servlet implementation class ManageUsers
  */
@@ -33,14 +34,14 @@ public class ManageUsers extends HttpServlet {
 		String option = request.getParameter("option"); // Get option number
 		if (option.equals("1")) { // Option 1
 			// !!!!!!!!!! Must create a Member first and link with User !!!!!!!!!!
-			String ID = request.getParameter("createUserID"); // Get User's ID
+			// String ID = request.getParameter("createUserID"); // Get User's ID
 			String username = request.getParameter("createUserUsername"); // Get User's username
 			String password = request.getParameter("createUserPassword"); // Get User's password
-			if (ID.isEmpty() || username.isEmpty() || password.isEmpty()) { // If a field is empty
+			if (username.isEmpty() || password.isEmpty()) { // If a field is empty
 				RequestDispatcher req = request.getRequestDispatcher("AdministratorPortal.jsp");
 				req.include(request, response); // Redirect to admin portal
 			}
-			Users.insert(ID, username, password); // Create and add user to DB
+			Users.insert(username, password); // Create and add user to DB
 		} else if (option.equals("2")) { // Option 2
 			String ID = request.getParameter("deleteUserID"); // Get User's ID
 			if (ID.isEmpty()) { // If a field is empty

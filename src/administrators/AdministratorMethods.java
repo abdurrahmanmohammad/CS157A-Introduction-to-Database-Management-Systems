@@ -1,10 +1,15 @@
+package administrators;
+
+import courses.Courses;
+import users.Users;
+
 
 
 // Methods for administrator will be called using this class and not directly.
 // Will provide mechanisms to resolve collisions and error handling (will be covered in class)
 // Will provide mechanism for sanitizing input and output
 // Will provide built in security features such as hashing
-public class Administrator {
+public class AdministratorMethods {
 
 	public static boolean createCourse(String department, String number, String name, String units, String cost) {
 		return Courses.insert(department, number, name, units, cost);

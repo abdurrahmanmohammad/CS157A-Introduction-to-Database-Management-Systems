@@ -1,5 +1,6 @@
+package instructors;
 
-public class Instructor {
+public class InstructorMethods {
 	
 	public static void addStudent(String course) {
 		

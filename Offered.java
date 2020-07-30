@@ -1,4 +1,4 @@
-import java.sql.*;
+/*import java.sql.*;
 
 public class Offered {
 	private static String driver = "com.mysql.cj.jdbc.Driver";
@@ -69,3 +69,4 @@ public class Offered {
 		return "Database closed successfully."; // If database was closed successfully
 	}
 }
+*/

@@ -1,3 +1,5 @@
+package configurations;
+
 import SQL.SQLMethods;
 
 import java.sql.SQLException;

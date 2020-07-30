@@ -1,7 +1,10 @@
+package students;
+import courses.Courses;
 
-public class Student {
 
-	public static String register(String course, String department, String number, String name) {
+public class StudentMethods {
+
+	/*public static String register(String course, String department, String number, String name) {
 		String error = Courses.mysqlConnect(); // Connect to DB: Return error message if connection failed
 		if (error != "Successfully connected to database.") return error;
 		try {
@@ -37,5 +40,5 @@ public class Student {
 	
 	public static void printTranscript() {
 		
-	}
+	}*/
 }
