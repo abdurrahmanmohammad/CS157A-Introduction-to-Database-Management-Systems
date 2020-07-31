@@ -30,23 +30,28 @@ public class Students {
 			result.next();
 			int seatCount = result.getInt("seatcap");
 			//System.out.printf("seatcount %d\n", seatCount);
-			if (registeredCount < seatCount)
-			{
-				pstate = SQLMethods.con.prepareStatement("INSERT INTO Registers(studentID, department, number, configID)" + "values(?, ?, ?, ?)");
+			if (registeredCount < seatCount) {
+                pstate = SQLMethods.con.prepareStatement("INSERT INTO Registers(studentID, department, number, configID)" + "values(?, ?, ?, ?)");
 			}
-			pstate.setString(1, studentID);
+			else
+                {
+                pstate = SQLMethods.con.prepareStatement("INSERT INTO Wailtlists(studentID, department, number, configID)" + "values(?, ?, ?, ?)");
+                }
+            pstate.setString(1, studentID);
 			pstate.setString(2, department);
 			pstate.setString(3, number);
 			pstate.setString(4, configID);
 			int value = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+            return true; // Success
+
+        } catch (SQLException e) {
+			SQLethods.mysql_fatal_error("Query error");
 		}
+
 		return false; // Return false as a default value
 	}
-	
+
 	/*public static boolean drop() {
 
 	}
