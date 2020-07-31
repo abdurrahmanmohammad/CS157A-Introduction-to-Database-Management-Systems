@@ -74,9 +74,36 @@ textarea.contact-form-text {
 .contact-form-btn:hover {
 	background: #2980b9;
 }
+.topnav {
+	overflow: hidden;
+	background-color: #030024;
+}
+
+.topnav a {
+	float: left;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-size: 17px;
+}
+
+.topnav a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+.topnav a.active {
+	background-color: #010d42;
+	color: white;
+}
 </style>
 </head>
 <body>
+<div class="topnav">
+		<a class="active" href="index.jsp">Course Management System</a> <a
+			href="login.jsp">Login</a> <a href="register.jsp">Register</a> <a href="#about">About</a>
+	</div>
 	<div class="contact-section">
 		<h1>Register</h1>
 		<div class="border"></div>
