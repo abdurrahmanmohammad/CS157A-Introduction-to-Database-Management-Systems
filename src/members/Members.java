@@ -3,7 +3,6 @@ package members;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import SQL.SQLMethods;
 
 // Members(ID, firstname, lastname, phone, email, address)
@@ -11,6 +10,27 @@ import SQL.SQLMethods;
 public class Members {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
+
+	/**
+	 * Check if a member with ID already exists
+	 */
+	public static boolean checkID(String ID) {
+		if (ID == null) return false; // Attribute ID is null
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to check
+			pstate = SQLMethods.con.prepareStatement("SELECT COUNT(*) FROM Members WHERE ID = ?");
+			pstate.setString(1, ID);
+			result = pstate.executeQuery();
+			result.next();
+			int rowcount = result.getInt(1);
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 0); // Returns true if ID DNE
+		} catch (SQLException e) {
+			SQLMethods.mysql_fatal_error("Query error");
+		}
+		return false; // Return false as a default value
+	}
 
 	/**
 	 * Method to create and insert a member into the DB. Returns true if successful,
@@ -27,14 +47,13 @@ public class Members {
 		if (address == null) return false; // Attribute address is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement(
-					"INSERT INTO Members(ID, firstname, lastname, phone, email, address)" + "values(?, ?, ?, ?, ?, ?)");
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Members VALUES(?, ?, ?, ?, ?, ?)");
 			pstate.setString(1, ID);
 			pstate.setString(2, firstname);
 			pstate.setString(3, lastname);
-			pstate.setString(3, phone);
-			pstate.setString(3, email);
-			pstate.setString(3, address);
+			pstate.setString(4, phone);
+			pstate.setString(5, email);
+			pstate.setString(6, address);
 			int value = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Success
@@ -82,7 +101,7 @@ public class Members {
 		}
 		return false; // Return false as a default value
 	}
-	
+
 	/**
 	 * Update email of a member
 	 */
@@ -102,7 +121,7 @@ public class Members {
 		}
 		return false; // Return false as a default value
 	}
-	
+
 	/**
 	 * Update address of a member
 	 */

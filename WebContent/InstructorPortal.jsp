@@ -21,6 +21,5 @@
 			<td><a href="login.jsp"><b>Logout</b></a></td>
 		</tr>
 	</table>
-
 </body>
 </html>

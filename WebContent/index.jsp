@@ -41,8 +41,8 @@ body {
 </style>
 <body>
 	<div class="topnav">
-		<a class="active" href="#home">Course Management System</a> <a
-			href="#news">News</a> <a href="#contact">Contact</a> <a href="#about">About</a>
+		<a class="active" href="index.jsp">Course Management System</a> <a
+			href="login.jsp">Login</a> <a href="register.jsp">Register</a> <a href="#about">About</a>
 	</div>
 	<h1 style="color: white; text-align: center; font-size: 200%;">Welcome
 		to the Course Management System</h1>
