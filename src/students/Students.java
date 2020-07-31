@@ -11,16 +11,43 @@ public class Students {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
 
-	/*public static boolean resgister(String SID, String department, String number, String configID) {
+	public static boolean register(String SID, String department, String number, String configID) {
 		if (SID == null) return false;
 		if (department == null) return false; 
 		if (number == null) return false;
 		if (configID == null) return false;
-		return false;
-
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to insert
+			pstate = SQLMethods.con.prepareStatement("SELECT count(*) AS rowcount FROM Registers");
+			result = pstate.executeQuery();
+			result.next();
+			int registeredCount = result.getInt("registeredcount");
+			//System.out.printf("rowcount %d\n", registeredCount);
+			result.close();
+			pstate = SQLMethods.con.prepareStatement("SELECT seats AS seatcap FROM Configuration WHERE configID = ?");
+			pstate.setString(1, configID);
+			result = pstate.executeQuery(); // Execute query
+			result.next();
+			int seatCount = result.getInt("seatcap");
+			//System.out.printf("seatcount %d\n", seatCount);
+			if (registeredCount < seatCount)
+			{
+				pstate = SQLMethods.con.prepareStatement("INSERT INTO Registers(studentID, department, number, configID)" + "values(?, ?, ?, ?)");
+			}
+			pstate.setString(1, studentID);
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setString(4, configID);
+			int value = pstate.executeUpdate();
+			SQLMethods.closeConnection(); // Close connection
+			return true; // Success
+		} catch (SQLException e) {
+			SQLMethods.mysql_fatal_error("Query error");
+		}
+		return false; // Return false as a default value
 	}
 	
-	public static boolean drop() {
+	/*public static boolean drop() {
 
 	}
 	
