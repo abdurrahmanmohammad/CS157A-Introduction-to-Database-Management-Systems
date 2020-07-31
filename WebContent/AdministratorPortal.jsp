@@ -67,5 +67,6 @@
 		<input type="hidden" name="option" value="4">
 		<input type="submit" name="deleteCourse" value="Delete Course" />
 	</form>
+	<a href="login.jsp"><b>Logout</b>
 </body>
 </html>

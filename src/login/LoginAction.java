@@ -1,14 +1,12 @@
 package login;
 
 import java.io.IOException;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import users.Users;
 
 /**
@@ -27,33 +25,41 @@ public class LoginAction extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		/** Get inputs */
 		String username = request.getParameter("username"); // Get username
 		String password = request.getParameter("password"); // Get password
-		if(username.isEmpty()|| password.isEmpty()) { // if username or password are empty
+		/** Check if inputs username and/or password are empty */
+		if (username.isEmpty() || password.isEmpty()) {
 			RequestDispatcher req = request.getRequestDispatcher("login.jsp"); // Return to login page
-			req.include(request, response); // Request the username and password, get the response, redirect to login page
-		} else { 
-			// Check password and authenticate user
-			// Check if User is a student, instructor, or administrator
-			// Redirect to respective portal/page
-			// Users.authenticate(username, password): Checks is username exists and passwords match and returns a boolean
-			if(Users.authenticate(username, password)) {
-				int type = Users.getType(username); 
-				// Users.getType(username) checks if the user is a student, instructor, or administrator
+			req.include(request, response); // Request username and password, get the response, redirect to login page
+		} else {
+			/** Check password and authenticate user */
+			// Users.authenticate(username, password): Checks is username and password combo exists in DB
+			if (Users.authenticate(username, password)) {
+				/** Check if User is a student, instructor, or administrator */
+				int type = Users.getType(username);
+				// Users.getType(username) checks if the user is a student, instructor, or
+				// administrator
 				// 1 = Administrator, 2 = Instructor, 3 = Student
-				if(type == 1) { // If the user is an administrator
+				/** Redirect to respective portal/page */
+				if (type == 1) { // If the user is an administrator
 					RequestDispatcher req = request.getRequestDispatcher("AdministratorPortal.jsp");
 					req.forward(request, response);
-				} else if(type == 2) { // If the user is an instructor
+				} else if (type == 2) { // If the user is an instructor
 					RequestDispatcher req = request.getRequestDispatcher("InstructorPortal.jsp");
 					req.forward(request, response);
 				} else { // If the user is a student
 					RequestDispatcher req = request.getRequestDispatcher("StudentPortal.jsp");
 					req.forward(request, response);
 				}
+			} else { // If incorrect, go to invalid login page
+				RequestDispatcher req = request.getRequestDispatcher("invalidLogin.jsp");
+				req.include(request, response);
 			}
 		}
 	}

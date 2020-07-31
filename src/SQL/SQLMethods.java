@@ -2,15 +2,14 @@ package SQL;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLMethods {
-	private static String driver = "com.mysql.cj.jdbc.Driver";
-	private static String connection = "jdbc:mysql://localhost:3306/demo?serverTimezone=UTC";
+	private static String driver = "com.mysql.cj.jdbc.Driver"; // Was: "com.mysql.jdbc.Driver"
+	private static String connection = "jdbc:mysql://localhost:3306/Course%20Management%20System?serverTimezone=UTC"; 
+
 	private static String user = "root"; // 'root' is default username
-	private static String password = "root"; // 'root' is default password
+	private static String password = "2045Canary"; // 'root' is default password (computer pswd)
 	public static Connection con = null;
 	
 	/** Attempts to connect to DB. Exits if error. */
