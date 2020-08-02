@@ -5,13 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /** Registers(studentID, department, number, configID) */
 public class Registers {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
-
-	// Students(studentID, balance, unit_cap)
 
 	/**
 	 * Method that allows students to register for a course. Method adds values to
@@ -26,34 +25,32 @@ public class Registers {
 	 * @return true if successful, false if failure
 	 */
 	public static boolean register(String studentID, String department, String number, String configID) {
-		if (studentID == null) return false;
-		if (department == null) return false;
-		if (number == null) return false;
-		if (configID == null) return false;
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || department == null || number == null || configID == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
 			/** Check if student already registered for this course */
-			if (isRegistered(studentID, department, number, configID)) return false; // Return false if already
-																						// registered
+			// Return false if already registered
+			if (isRegistered(studentID, department, number, configID)) return false;
 			/** Check if seats are open */
-			if (isOpen(department, number, configID)) { // If course is open, register course
+			if (isOpen(department, number, configID)) { // If course is open, register for course
 				pstate = SQLMethods.con.prepareStatement(
-						"INSERT INTO Registers(studentID, department, number, configID) VALUES(?, ?, ?, ?)");
-			} else { // If course is open, waitlist course
+						"INSERT INTO Registers(studentID, department, number, configID) VALUES(?, ?, ?, ?);");
+			} else { // If course is not open, waitlist course
 				pstate = SQLMethods.con.prepareStatement(
-						"INSERT INTO Wailtlists(studentID, department, number, configID) VALUES(?, ?, ?, ?)");
+						"INSERT INTO Wailtlists(studentID, department, number, configID) VALUES(?, ?, ?, ?);");
 			}
 			pstate.setString(1, studentID);
 			pstate.setString(2, department);
 			pstate.setString(3, number);
 			pstate.setString(4, configID);
-			int value = pstate.executeUpdate();
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
@@ -62,10 +59,10 @@ public class Registers {
 	 * 
 	 * @throws SQLException
 	 */
-	public static boolean isRegistered(String studentID, String department, String number, String configID)
+	private static boolean isRegistered(String studentID, String department, String number, String configID)
 			throws SQLException {
 		pstate = SQLMethods.con.prepareStatement(
-				"SELECT count(*) FROM Registers WHERE studentID = ? AND department = ? AND number = ? AND configID = ?");
+				"SELECT Count(*) FROM Registers WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
 		pstate.setString(1, studentID);
 		pstate.setString(2, department);
 		pstate.setString(3, number);
@@ -81,10 +78,10 @@ public class Registers {
 	 * Checks if a course is open by counting the number of registered students and
 	 * comparing them with the seats available for the course's configuration.
 	 */
-	public static boolean isOpen(String department, String number, String configID) throws SQLException {
+	private static boolean isOpen(String department, String number, String configID) throws SQLException {
 		/** Get number of registrants for a particular course */
 		pstate = SQLMethods.con.prepareStatement(
-				"SELECT count(*) FROM Registers WHERE department = ? AND number = ? AND configID = ?");
+				"SELECT Count(*) FROM Registers WHERE department = ? AND number = ? AND configID = ?;");
 		pstate.setString(1, department);
 		pstate.setString(2, number);
 		pstate.setString(3, configID);
@@ -100,7 +97,7 @@ public class Registers {
 
 	/** Gets the seats for a particular configuration */
 	public static int getSeats(String configID) throws SQLException {
-		pstate = SQLMethods.con.prepareStatement("SELECT seats FROM Configurations WHERE configID = ?");
+		pstate = SQLMethods.con.prepareStatement("SELECT seats FROM Configurations WHERE configID = ?;");
 		pstate.setString(1, configID);
 		result = pstate.executeQuery(); // Execute query
 		result.next();
@@ -139,26 +136,79 @@ public class Registers {
 		return false; // Return false as a default value
 	}
 
-	public static ArrayList<ArrayList<String>> viewRegisteredCourses(String ID) {
-		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
-		if (ID == null) return null; // Check if ID is null, return empty list
+	/**
+	 * Returns an ArrayList of all courses registered by a student identified by
+	 * studentID
+	 * 
+	 * @param studentID
+	 * @return
+	 */
+	public static ArrayList<HashMap<String, String>> viewRegisteredCourses(String studentID) {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null) return output; // Check if studentID is null, return empty list if so
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
+			/** Search and retrieve tuple */
 			pstate = SQLMethods.con.prepareStatement(
-					"SELECT department,number, title FROM Courses c, Registers r WHERE c.department = r.department AND c.number = r.number AND r.studentID = ?;");
-			pstate.setString(1, ID);
+					"SELECT * FROM Registers JOIN Configurations Using (configID) WHERE studentID = ? ORDER BY year DESC;");
+			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
-			SQLMethods.closeConnection(); // Close connection
+			/** Extract tuple data */
 			while (result.next()) {
-				ArrayList<String> tuple = new ArrayList<String>();
-				tuple.add(result.getString("department"));
-				tuple.add(result.getString("number"));
-				tuple.add(result.getString("title"));
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("term", result.getString("term"));
+				tuple.put("year", result.getString("year"));
+				tuple.put("department", result.getString("department"));
+				tuple.put("number", result.getString("number"));
+				tuple.put("days", result.getString("days"));
+				tuple.put("time", result.getString("time"));
+				tuple.put("room", result.getString("room"));
 				output.add(tuple);
 			}
 			result.close(); // Close result
-			return output; // Success
-		} catch (SQLException e) {
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output; // Return false as a default value
+	}
+
+	/**
+	 * Returns an ArrayList of all courses waitlisted by a student identified by
+	 * studentID
+	 * 
+	 * @param studentID
+	 * @return
+	 */
+	public static ArrayList<HashMap<String, String>> viewWaitlistedCourses(String studentID) {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null) return output; // Check if studentID is null, return empty list if so
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search and retrieve tuple */
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Waitlists JOIN Configurations Using (configID) WHERE studentID = ? ORDER BY year DESC;");
+			pstate.setString(1, studentID);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("term", result.getString("term"));
+				tuple.put("year", result.getString("year"));
+				tuple.put("department", result.getString("department"));
+				tuple.put("number", result.getString("number"));
+				tuple.put("days", result.getString("days"));
+				tuple.put("time", result.getString("time"));
+				tuple.put("room", result.getString("room"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Return false as a default value

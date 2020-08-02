@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import students.Students;
 
 import SQL.SQLMethods;
@@ -23,9 +25,8 @@ public class Transactions {
 	 * @return
 	 */
 	public static boolean pay(String studentID, String creditcard, int amount) {
-		/** Initialize and check for null inputs */
-		if (studentID == null) return false;
-		if (creditcard == null) return false;
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || creditcard == null) return false;
 		/** Generate timestsamp */
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		try {
@@ -35,8 +36,8 @@ public class Transactions {
 			pstate.setString(2, creditcard);
 			// Timestamp is auto-generated in SQL table
 			/** Retrieve student's balance */
-			ArrayList<String> student = Students.searchByStudentID(studentID); // Search and retrieve student's
-			int balance = Integer.parseInt(student.get(2)) + amount; // Calculate new balance
+			HashMap<String, String> student = Students.searchByStudentID(studentID); // Search and retrieve student
+			int balance = Integer.parseInt(student.get("balance")) + amount; // Calculate new balance
 			/** Update student's balance */
 			Students.updateBalance(studentID, balance);
 		} catch (SQLException e) {

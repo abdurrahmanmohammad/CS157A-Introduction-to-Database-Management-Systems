@@ -5,32 +5,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+/** Students(studentID, balance, unit_cap) */
 public class Students {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
-	
+
 	/**
 	 * Method to create and insert a student in the DB. Returns true if successful,
 	 * otherwise false.
 	 */
-	public static boolean insert(String studentID, int balance, String unit_cap) {
-		// Check if inputs are null
-		if (studentID == null) return false; // Attribute ID is null
-		if (unit_cap == null) return false; // Attribute unit_cap is null
+	public static boolean insert(String studentID, int balance, int unit_cap) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || unit_cap < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Students VALUES(?, ?, ?)");
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Students VALUES(?, ?, ?);");
 			pstate.setString(1, studentID);
 			pstate.setInt(2, balance);
-			pstate.setString(3, unit_cap);
-			int value = pstate.executeUpdate();
+			pstate.setInt(3, unit_cap);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
@@ -38,80 +39,86 @@ public class Students {
 	 * otherwise false.
 	 */
 	public static boolean delete(String studentID) {
+		/** Check for invalid inputs. If any input is null, return false */
 		if (studentID == null) return false; // Check if ID is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Students WHERE studentID = ?");
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Students WHERE studentID = ?;");
 			pstate.setString(1, studentID);
-			int value = pstate.executeUpdate();
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
-	public static boolean updateUnitCap(String studentID, String unit_cap) {
-		if (studentID == null) return false; // Check if ID is null
-		if (unit_cap == null) return false; // Check if unit_cap is null
+	public static boolean updateUnitCap(String studentID, int unit_cap) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || unit_cap < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET unit_cap = ? WHERE studentID = ?");
-			pstate.setString(1, unit_cap); // New username
+			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET unit_cap = ? WHERE studentID = ?;");
+			pstate.setInt(1, unit_cap); // New username
 			pstate.setString(2, studentID); // ID of user
-			int value = pstate.executeUpdate(); // Execute statement
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	public static boolean updateBalance(String studentID, int balance) {
-		if (studentID == null) return false; // Check if ID is null
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET balance = ? WHERE studentID = ?");
+			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET balance = ? WHERE studentID = ?;");
 			pstate.setInt(1, balance); // New password
 			pstate.setString(2, studentID); // ID of user
-			int value = pstate.executeUpdate(); // Execute statement
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
 	 * Search a student by its ID and return the values of its attributes as strings
-	 * in a linked list.
 	 * 
 	 * @param balance
 	 * @return
 	 */
-	public static ArrayList<String> searchByStudentID(String studentID) {
-		ArrayList<String> output = new ArrayList<String>();
+	public static HashMap<String, String> searchByStudentID(String studentID) {
+		HashMap<String, String> output = new HashMap<String, String>();
 		if (studentID == null) return output;
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?");
+			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?;");
 			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
-			SQLMethods.closeConnection(); // Close connection
 			/** Should return only 1 student because studentID is a primary key */
 			result.next();
-			output.add(result.getString("ID"));
-			output.add(result.getString("balance"));
-			output.add(result.getString("unit_cap"));
+			/** Students(studentID, balance, unit_cap) */
+			output.put("studentID", result.getString("studentID"));
+			output.put("balance", Integer.toString(result.getInt("balance")));
+			output.put("unit_cap", Integer.toString(result.getInt("unit_cap")));
 			result.close(); // Close result
-			return output; // Success
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return student info
 		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString()); // Print error and exit
 		}
 		return output; // default value
 	}
+
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	public static ArrayList<ArrayList<String>> searchByBalance(int balance) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();

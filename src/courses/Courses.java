@@ -66,6 +66,12 @@ public class Courses {
 		return false; // Default value: false
 	}
 
+	/**
+	 * Method to search for a course using its PK
+	 * @param department
+	 * @param number
+	 * @return a HashMap containing the attributes of the course
+	 */
 	public static HashMap<String, String> search(String department, String number) {
 		HashMap<String, String> output = new HashMap<String, String>();
 		/** Check for invalid inputs. If any input is null, return false */
