@@ -1,7 +1,6 @@
 package courses;
 
 import SQL.SQLMethods;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,14 +24,8 @@ public class Courses {
 		if (cost == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-				// using PreparedStatement
-			pstate = SQLMethods.con.prepareStatement(
-					"INSERT INTO Courses(ID, department, number, title, units, cost)" + "values(?, ?, ?, ?, ?, ?)");
-			String ID = (int) ( (Math.random() * ((999999999 - 100000000) + 1)) + 100000000 ) + "";
-			while (!generatedIDs.isEmpty() && generatedIDs.contains(ID) ) {
-				ID = (int) ( (Math.random() * ((999999999 - 100000000) + 1)) + 100000000 ) + "";
-			} generatedIDs.add(ID);
-			pstate.setString(1, ID);
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?, ?)");
+			String ID = (int) ((Math.random() * ((999999999 - 100000000) + 1)) + 100000000) + "";
 			pstate.setString(2, department);
 			pstate.setString(3, number);
 			pstate.setString(4, title);
@@ -223,7 +216,7 @@ public class Courses {
 		}
 		return output; // Return false as a default value
 	}
-	
+
 	public static ArrayList<ArrayList<String>> searchNumber(String number) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
 		if (number == null) return output; // Check if number is null, return empty list if so
@@ -249,7 +242,7 @@ public class Courses {
 		}
 		return output; // Return false as a default value
 	}
-	
+
 	public static ArrayList<ArrayList<String>> searchTitle(String title) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
 		if (title == null) return output; // Check if title is null, return empty list if so

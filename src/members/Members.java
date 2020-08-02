@@ -3,6 +3,8 @@ package members;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+
 import SQL.SQLMethods;
 
 // Members(ID, firstname, lastname, phone, email, address)
@@ -141,4 +143,38 @@ public class Members {
 		}
 		return false; // Return false as a default value
 	}
+
+	/**
+	 * Search for a member using ID and return all member's attributes in DB
+	 * 
+	 * @param ID
+	 * @return all member's attributes in DB
+	 */
+	public static HashMap<String, String> search(String ID) {
+		HashMap<String, String> output = new HashMap<String, String>();
+		if (ID == null) return output; // Check if ID is null
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search for member using ID */
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Members WHERE ID = ?");
+			pstate.setString(1, ID); // ID of member
+			result = pstate.executeQuery(); // Execute query
+			/** Extract member data */
+			// Members(ID, firstname, lastname, phone, email, address)
+			result.next();
+			output.put("ID", result.getString("ID"));
+			output.put("firstname", result.getString("firstname"));
+			output.put("lastname", result.getString("lastname"));
+			output.put("phone", result.getString("phone"));
+			output.put("email", result.getString("email"));
+			output.put("address", result.getString("address"));
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Success
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output; // Default value: empty HashMap
+	}
+
 }

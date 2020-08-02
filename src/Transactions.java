@@ -1,0 +1,78 @@
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import students.Students;
+
+import SQL.SQLMethods;
+
+/** Transactions(studentID, creditcard, timestamp) */
+public class Transactions {
+	private static ResultSet result;
+	private static PreparedStatement pstate;
+
+	/**
+	 * Method to pay for a course and then update student balance.
+	 * 
+	 * @param studentID
+	 * @param creditcard
+	 * @param amount
+	 * @return
+	 */
+	public static boolean pay(String studentID, String creditcard, int amount) {
+		/** Initialize and check for null inputs */
+		if (studentID == null) return false;
+		if (creditcard == null) return false;
+		/** Generate timestsamp */
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		try {
+			/** Add to Transactions table */
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Transactions VALUES(?, ?, NULL);");
+			pstate.setString(1, studentID);
+			pstate.setString(2, creditcard);
+			// Timestamp is auto-generated in SQL table
+			/** Retrieve student's balance */
+			ArrayList<String> student = Students.searchByStudentID(studentID); // Search and retrieve studen'ts
+																				// attributes in DB
+			int balance = Integer.parseInt(student.get(2)) + amount; // Calculate new balance
+			/** Update student's balance */
+			Students.updateBalance(studentID, balance);
+		} catch (SQLException e) {
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Return false as a default value
+	}
+
+	/**
+	 * View transaction history of a student using studentID
+	 * 
+	 * @param studentID
+	 * @return a linked list containing the transaction history
+	 */
+	public static ArrayList<ArrayList<String>> viewTransactions(String studentID) {
+		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
+		if (studentID == null) return output; // Return empty list
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?");
+			pstate.setString(1, studentID);
+			result = pstate.executeQuery(); // Execute query
+			SQLMethods.closeConnection(); // Close connection
+			while (result.next()) {
+				ArrayList<String> tuple = new ArrayList<String>();
+				tuple.add(result.getString("studentID"));
+				tuple.add(result.getString("creditcard"));
+				tuple.add(result.getString("timestamp"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Success
+		} catch (SQLException e) {
+			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+		}
+		return output; // default value
+
+	}
+
+}
