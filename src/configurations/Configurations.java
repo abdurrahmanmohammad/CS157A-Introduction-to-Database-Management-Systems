@@ -36,13 +36,18 @@ public class Configurations {
 			pstate.setInt(6, seats);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return (rowcount == 1); // If rowcount == 1, 1 row successfully inserted
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false;
+		return false; // Default value: false
 	}
 
+	/**
+	 * Delete a configuration
+	 * @param configID
+	 * @return
+	 */
 	public static boolean delete(String configID) {
 		/** Check for invalid inputs. If any input is null, return false */
 		if (configID == null) return false;
@@ -93,7 +98,9 @@ public class Configurations {
 		return output; // Return false as a default value
 	}
 
-	/** #################### Unused Methods Below #################### */
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	public static boolean updateRoom(String ID, String newRoom) {
 		if (ID == null) return false; // Check if ID is null

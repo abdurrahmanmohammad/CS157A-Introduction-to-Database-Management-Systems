@@ -6,38 +6,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/** Courses(department, number, title, units, cost) */
 public class Courses {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
 
-	private static ArrayList<String> generatedIDs = new ArrayList<>();
-
-	// Insert
-	// Example Course: CS 157A Introduction to Database Management Systems
-	// Primary key: (department, number)
-	public static boolean insert(String department, String number, String title, String units, String cost) {
-		// Check for errors in input and return errors to caller
-		if (department == null) return false;
-		if (number == null) return false;
-		if (title == null) return false;
-		if (units == null) return false;
-		if (cost == null) return false;
+	/**
+	 * Insert a course
+	 * 
+	 * @param department
+	 * @param number
+	 * @param title
+	 * @param units
+	 * @param cost
+	 * @return true if successful insert, else false
+	 */
+	public static boolean insert(String department, String number, String title, int units, int cost) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (department == null || number == null || title == null || units < 0 || cost < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
 			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?, ?)");
-			String ID = (int) ((Math.random() * ((999999999 - 100000000) + 1)) + 100000000) + "";
-			pstate.setString(2, department);
-			pstate.setString(3, number);
-			pstate.setString(4, title);
-			pstate.setString(5, units);
-			pstate.setString(6, cost);
-			int value = pstate.executeUpdate();
+			pstate.setString(1, department);
+			pstate.setString(2, number);
+			pstate.setString(3, title);
+			pstate.setInt(4, units);
+			pstate.setInt(5, cost);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	// Delete

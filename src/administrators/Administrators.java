@@ -7,68 +7,115 @@ import java.util.ArrayList;
 
 import SQL.SQLMethods;
 
-// Administrators(ID, clearance)
+/** Administrators(adminID, clearance) */
+// Clearance 1 = manage accounts
+// Clearance 2 = manage courses
+// Clearance 3 = manage all
+
 public class Administrators {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
 
 	/**
-	 * Method to create and insert a student in the DB. Returns true if successful,
-	 * otherwise false.
+	 * Insert an admin in Admin table
+	 * 
+	 * @param adminID
+	 * @param clearance
+	 * @return Returns true if successful,otherwise false
 	 */
-	public static boolean insert(String ID, String clearance) {
-		// Check if inputs are null
-		if (ID == null) return false; // Attribute ID is null
-		if (clearance == null) return false; // Attribute clearance is null
+	public static boolean insertAdmin(String adminID, int clearance) {
+		if (adminID == null || clearance < 0 || clearance > 3) return false;
+		if (adminID == null || clearance < 0 || clearance > 3) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Administrators(ID, clearance)" + "values(?, ?)");
-			pstate.setString(1, ID);
-			pstate.setString(2, clearance);
-			int value = pstate.executeUpdate();
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Administrators Values (?, ?);");
+			pstate.setString(1, adminID);
+			pstate.setInt(2, clearance);
+			int rowcount = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
-	 * Method to delete a user using ID. Returns true if successful, otherwise
-	 * false.
+	 * Delete an admin in Admin table
+	 * 
+	 * @param adminID
+	 * @return
 	 */
-	public static boolean delete(String ID) {
-		if (ID == null) return false; // Check if ID is null
+	public static boolean deleteAdmin(String adminID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (adminID == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Administrators WHERE ID = ?");
-			pstate.setString(1, ID);
-			int value = pstate.executeUpdate();
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Administrators WHERE adminID = ?;");
+			pstate.setString(1, adminID);
+			int rowcount = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully deleted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
-	public static boolean updateclearance(String ID, String clearance) {
-		if (ID == null) return false; // Check if ID is null
-		if (clearance == null) return false; // Check if unit_cap is null
+	/**
+	 * Change clearance of an existing admin with specified adminID
+	 * 
+	 * @param adminID
+	 * @param newClearance
+	 * @return true if successful, false if failure
+	 */
+	public static boolean setClearance(String adminID, int newClearance) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (adminID == null || newClearance < 0 || newClearance > 3) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Administrators SET clearance = ? WHERE ID = ?");
-			pstate.setString(1, clearance); // New clearance
-			pstate.setString(2, ID); // ID of user
-			int value = pstate.executeUpdate(); // Execute statement
+			pstate = SQLMethods.con.prepareStatement("UPDATE Administrators SET clearance = ? WHERE adminID = ?;");
+			pstate.setInt(1, newClearance); // New clearance
+			pstate.setString(2, adminID); // adminID of admin
+			int rowcount = pstate.executeUpdate(); // Execute statement
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
+
+	/**
+	 * Retrieve clearance of an existing admin with specified adminID
+	 * 
+	 * @param adminID
+	 * @return clearance of an existing admin
+	 */
+	public static int getClearance(String adminID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (adminID == null) return -1;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search and retrieve tuple */
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Administrators WHERE adminID = ?;");
+			pstate.setString(1, adminID);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			result.next();
+			int clearance = result.getInt(1); // Get clearance
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return clearance; // Return clearance
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return -1; // Default value: -1
+	}
+
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	public static ArrayList<ArrayList<String>> searchClearance(String clearance) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
