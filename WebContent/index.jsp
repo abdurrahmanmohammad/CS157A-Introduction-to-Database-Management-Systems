@@ -8,7 +8,7 @@
 </head>
 <style>
 body {
-	background: url(bg1.jpg) no-repeat;
+	background: url(pictures/bg1.jpg) no-repeat;
 	background-size: cover;
 	margin: 0;
 	padding: 0;

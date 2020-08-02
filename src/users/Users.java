@@ -45,7 +45,7 @@ public class Users {
 		try {
 			// Check if user is an administrator
 			pstate = SQLMethods.con.prepareStatement(
-					"SELECT COUNT(*) FROM Administrators, Users WHERE Users.username = ? AND Administrators.ID = Users.ID;");
+					"SELECT COUNT(*) FROM Administrators, Users WHERE Users.username = ? AND Administrators.adminID = Users.ID;");
 			pstate.setString(1, username); // Sanitize input
 			result = pstate.executeQuery(); // Execute query
 			result.next();
@@ -55,7 +55,7 @@ public class Users {
 
 			// Check if user is an instructor
 			pstate = SQLMethods.con.prepareStatement(
-					"SELECT COUNT(*) FROM Instructors, Users WHERE Users.username = ? AND Instructors.ID = Users.ID;");
+					"SELECT COUNT(*) FROM Instructors, Users WHERE Users.username = ? AND Instructors.instructorID = Users.ID;");
 			pstate.setString(1, username); // Sanitize input
 			result = pstate.executeQuery(); // Execute query
 			result.next();
@@ -65,7 +65,7 @@ public class Users {
 
 			// Check if user is a student
 			pstate = SQLMethods.con.prepareStatement(
-					"SELECT COUNT(*) FROM Students, Users WHERE Users.username = ? AND Students.ID = Users.ID;");
+					"SELECT COUNT(*) FROM Students, Users WHERE Users.username = ? AND Students.studentID = Users.ID;");
 			pstate.setString(1, username); // Sanitize input
 			result = pstate.executeQuery(); // Execute query
 			result.next();
@@ -148,6 +148,26 @@ public class Users {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Default value: empty HashMap
+	}
+
+	public static String getID(String username) {
+		if (username == null) return ""; // Check if ID is null
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search for user using ID */
+			pstate = SQLMethods.con.prepareStatement("SELECT ID FROM Users WHERE username = ?");
+			pstate.setString(1, username); // username of member
+			result = pstate.executeQuery(); // Execute query
+			/** Extract member data */
+			result.next();
+			username = result.getString(1);
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return username; // Success
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return ""; // Default value: empty String
 	}
 
 	public static boolean update(String ID, String username, String password) {

@@ -7,7 +7,7 @@
 <title>Invalid Login</title>
 <style>
 body {
-	background: url(lock.jpg) no-repeat;
+	background: url(pictures/lock.jpg) no-repeat;
 	background-size: cover;
 	margin: 0;
 	padding: 0;

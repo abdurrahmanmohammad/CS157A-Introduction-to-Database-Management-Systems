@@ -54,7 +54,7 @@ public class LoginAction extends HttpServlet {
 					RequestDispatcher req = request.getRequestDispatcher("InstructorPortal.jsp");
 					req.forward(request, response);
 				} else { // If the user is a student
-					RequestDispatcher req = request.getRequestDispatcher("StudentPortal.jsp");
+					RequestDispatcher req = request.getRequestDispatcher("studentPortal.jsp");
 					req.forward(request, response);
 				}
 			} else { // If incorrect, go to invalid login page

@@ -7,7 +7,7 @@
 <title>Registration Confirmation</title>
 <style>
 body {
-	background: url(college.jpg) no-repeat;
+	background: url(pictures/college.jpg) no-repeat;
 	background-size: cover;
 	margin: 0;
 	padding: 0;

@@ -12,6 +12,7 @@ import SQL.SQLMethods;
 // Clearance 2 = manage courses
 // Clearance 3 = manage all
 
+/** Administrators(adminID, clearance) */
 public class Administrators {
 	private static ResultSet result;
 	private static PreparedStatement pstate;

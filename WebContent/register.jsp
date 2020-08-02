@@ -13,7 +13,7 @@
 }
 
 .contact-section {
-	background: url(registerBG.jpg) no-repeat top center;
+	background: url(pictures/registerBG.jpg) no-repeat top center;
 	background-size: cover;
 	height: 100vh;
 	padding: 40px 0;

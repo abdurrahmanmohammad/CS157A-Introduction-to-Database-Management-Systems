@@ -98,7 +98,7 @@ public class Students {
 		HashMap<String, String> output = new HashMap<String, String>();
 		if (studentID == null) return output;
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?;");
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Students WHERE studentID = ?;");
 			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
 			/** Should return only 1 student because studentID is a primary key */
@@ -124,7 +124,7 @@ public class Students {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE balance = ?");
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Students WHERE balance = ?");
 			pstate.setInt(1, balance);
 			result = pstate.executeQuery(); // Execute query
 			SQLMethods.closeConnection(); // Close connection
