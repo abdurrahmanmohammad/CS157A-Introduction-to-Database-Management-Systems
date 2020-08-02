@@ -372,5 +372,4 @@ public class Courses {
 		}
 		return output; // Return false as a default value
 	}
-
 }
