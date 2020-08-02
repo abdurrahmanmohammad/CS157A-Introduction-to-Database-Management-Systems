@@ -13,62 +13,78 @@ public class Instructors {
 	private static PreparedStatement pstate;
 
 	/**
-	 * Method to create and insert a student in the DB. Returns true if successful,
-	 * otherwise false.
+	 * Create and insert a student in the DB
+	 * 
+	 * @param instructorID
+	 * @param status
+	 * @return Returns true if successful, otherwise false.
 	 */
 	public static boolean insert(String instructorID, String status) {
-		// Check if inputs are null
-		if (instructorID == null) return false; // Attribute instructorID is null
-		if (status == null) return false; // Attribute status is null
+		/** Check for invalid inputs. If any input is null, return false */
+		if (instructorID == null || status == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Instructors(instructorID, status)" + "values(?, ?)");
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Instructors Values(?, ?);");
 			pstate.setString(1, instructorID);
 			pstate.setString(2, status);
-			int value = pstate.executeUpdate();
+			int rowcount = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
-	 * Method to delete a user using instructorID. Returns true if successful, otherwise
-	 * false.
+	 * Delete a user using instructorID
+	 * 
+	 * @param instructorID
+	 * @return Returns true if successful, otherwise false.
 	 */
 	public static boolean delete(String instructorID) {
+		/** Check for invalid inputs. If any input is null, return false */
 		if (instructorID == null) return false; // Check if instructorID is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Instructors WHERE instructorID = ?");
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Instructors WHERE instructorID = ?;");
 			pstate.setString(1, instructorID);
-			int value = pstate.executeUpdate();
+			int rowcount = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
-	public static boolean updateStatus(String instructorID, String status) {
-		if (instructorID == null) return false; // Check if instructorID is null
-		if (status == null) return false; // Check if unit_cap is null
+	/**
+	 * Update an instructor's status using instructorID
+	 * 
+	 * @param instructorID
+	 * @param newStatus
+	 * @return Returns true if successful, otherwise false.
+	 */
+	public static boolean updateStatus(String instructorID, String newStatus) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (instructorID == null || newStatus == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Instructors SET status = ? WHERE instructorID = ?");
-			pstate.setString(1, status); // New status
+			pstate = SQLMethods.con.prepareStatement("UPDATE Instructors SET status = ? WHERE instructorID = ?;");
+			pstate.setString(1, newStatus); // New status
 			pstate.setString(2, instructorID); // instructorID of user
-			int value = pstate.executeUpdate(); // Execute statement
+			int rowcount = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
+
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	public static ArrayList<ArrayList<String>> searchStatus(String status) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
@@ -92,4 +108,4 @@ public class Instructors {
 		}
 		return output; // Return false as a default value
 	}
-} 
+}

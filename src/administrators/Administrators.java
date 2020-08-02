@@ -23,7 +23,7 @@ public class Administrators {
 	 * @param clearance
 	 * @return Returns true if successful,otherwise false
 	 */
-	public static boolean insertAdmin(String adminID, int clearance) {
+	public static boolean insert(String adminID, int clearance) {
 		if (adminID == null || clearance < 0 || clearance > 3) return false;
 		if (adminID == null || clearance < 0 || clearance > 3) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
@@ -46,7 +46,7 @@ public class Administrators {
 	 * @param adminID
 	 * @return
 	 */
-	public static boolean deleteAdmin(String adminID) {
+	public static boolean delete(String adminID) {
 		/** Check for invalid inputs. If any input is null, return false */
 		if (adminID == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
