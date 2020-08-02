@@ -42,14 +42,15 @@ body {
 <body>
 	<div class="topnav">
 		<%String username = request.getParameter("username");%>
-		<%String studentID = Users.getID(username);%>
-		<a class="active" href="/CMS/index.jsp">Course Management System</a> 
+		<% String studentID = request.getParameter("studentID");%>
+		<%if(studentID == null)  studentID = Users.getID(username);%>	
+		<a class="active" href=<%="/CMS/studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
 		<a href=<%="add.jsp?studentID="+studentID%>>Add Courses</a>
 		<a href=<%="drop.jsp?studentID="+studentID%>>Drop Courses</a>
-		<a href="viewCourses.jsp">View Courses</a>
+		<a href=<%="viewCourses.jsp?studentID="+studentID%>>View Courses</a>
 		<a href=<%="transcript.jsp?studentID="+studentID%>>Transcript</a>
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
-		<a href="login.jsp">Account Management</a> <a href="/CMS/index.jsp">Logout</a>
+		<a href="/CMS/index.jsp">Logout</a>
 	</div>
 	<h1>Student Portal</h1>
 	<h2>Welcome Student

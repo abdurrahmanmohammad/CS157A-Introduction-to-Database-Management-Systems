@@ -48,9 +48,6 @@ body {
 		to the Course Management System</h1>
 
 	<h1 style="color: white; text-align: center; font-size: 150%;">Please
-		log in!</h1>
-	<form action="login.jsp" method="post" style="text-align:center">
-		<input type="submit" value="Login" />
-	</form>
+		log in or register!</h1>
 </body>
 </html>
