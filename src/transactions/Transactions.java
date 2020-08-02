@@ -62,7 +62,7 @@ public class Transactions {
 		if (studentID == null) return output; // Return empty list
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Transactions WHERE studentID = ?;");
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Transactions WHERE studentID = ? ORDER BY timestamp DESC;");
 			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
 			while (result.next()) {

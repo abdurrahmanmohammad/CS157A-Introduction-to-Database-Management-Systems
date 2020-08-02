@@ -60,6 +60,7 @@ body {
 	<table style="width: 100%">
 		<tr>
 			<td>Credit Card</td>
+			<td>Amount</td>
 			<td>Timestamp</td>
 		</tr>
 
