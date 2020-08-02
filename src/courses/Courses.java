@@ -26,7 +26,7 @@ public class Courses {
 		if (department == null || number == null || title == null || units < 0 || cost < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?, ?)");
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?, ?);");
 			pstate.setString(1, department);
 			pstate.setString(2, number);
 			pstate.setString(3, title);
@@ -41,21 +41,28 @@ public class Courses {
 		return false; // Default value: false
 	}
 
-	// Delete
-	public static boolean delete(String ID) {
-		// Check for errors in input and return errors to caller
-		if (ID == null) return false;
+	/**
+	 * Delete a course
+	 * 
+	 * @param department
+	 * @param number
+	 * @return true if successful insert, else false
+	 */
+	public static boolean delete(String department, String number) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (department == null || number == null) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete using PreparedStatement
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Courses WHERE ID = ?");
-			pstate.setString(1, "ID");
-			pstate.executeUpdate(); // int value = pstate.executeUpdate();
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Courses WHERE department = ? AND number = ?;");
+			pstate.setString(1, department);
+			pstate.setString(2, number);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return true;
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error");
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/** Update a course's department */
