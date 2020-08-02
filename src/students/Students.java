@@ -139,6 +139,30 @@ public class Students {
 		return false; // Return false as a default value
 	}
 
+    public static ArrayList<ArrayList<String>> viewRegisteredCourses(String ID) {
+        ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
+        if (ID == null) return null; // Check if ID is null, return empty list
+        SQLMethods.mysqlConnect(); // Connect to DB
+        try { // Attempt to search
+            pstate = SQLMethods.con.prepareStatement("SELECT department,number, title FROM Courses c, Registers r WHERE c.department = r.department AND c.number = r.number AND r.studentID = ?;");
+            pstate.setString(1, ID);
+            result = pstate.executeQuery(); // Execute query
+            SQLMethods.closeConnection(); // Close connection
+            while (result.next()) {
+                ArrayList<String> tuple = new ArrayList<String>();
+                tuple.add(result.getString("department"));
+                tuple.add(result.getString("number"));
+                tuple.add(result.getString("title"));
+                output.add(tuple);
+            }
+            result.close(); // Close result
+            return output; // Success
+        } catch (SQLException e) {
+            SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+        }
+        return output; // Return false as a default value
+    }
+
 
 
 	/**
