@@ -1,4 +1,5 @@
 package transactions;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,8 +35,7 @@ public class Transactions {
 			pstate.setString(2, creditcard);
 			// Timestamp is auto-generated in SQL table
 			/** Retrieve student's balance */
-			ArrayList<String> student = Students.searchByStudentID(studentID); // Search and retrieve studen'ts
-																				// attributes in DB
+			ArrayList<String> student = Students.searchByStudentID(studentID); // Search and retrieve student's
 			int balance = Integer.parseInt(student.get(2)) + amount; // Calculate new balance
 			/** Update student's balance */
 			Students.updateBalance(studentID, balance);
@@ -56,10 +56,9 @@ public class Transactions {
 		if (studentID == null) return output; // Return empty list
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?");
+			pstate = SQLMethods.con.prepareStatement("SELECT * Students WHERE studentID = ?;");
 			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
-			SQLMethods.closeConnection(); // Close connection
 			while (result.next()) {
 				ArrayList<String> tuple = new ArrayList<String>();
 				tuple.add(result.getString("studentID"));
@@ -68,9 +67,10 @@ public class Transactions {
 				output.add(tuple);
 			}
 			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
 			return output; // Success
 		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // default value
 	}
