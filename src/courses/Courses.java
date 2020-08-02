@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /** Courses(department, number, title, units, cost) */
 public class Courses {
@@ -64,6 +65,79 @@ public class Courses {
 		}
 		return false; // Default value: false
 	}
+
+	public static HashMap<String, String> search(String department, String number) {
+		HashMap<String, String> output = new HashMap<String, String>();
+		/** Check for invalid inputs. If any input is null, return false */
+		if (department == null || number == null) return output; // Check if ID is null, return empty list if so
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search and retrieve tuple */
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Courses WHERE department = ? AND number = ?;");
+			pstate.setString(1, department);
+			pstate.setString(2, number);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			result.next();
+			output.put("department", result.getString("department"));
+			output.put("number", result.getString("number"));
+			output.put("clearance", Integer.toString(result.getInt("clearance")));
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output; // Return false as a default value
+	}
+
+	/**
+	 * Method to update a course. First enter old department and number. Then enter
+	 * new values. If you wish not to change a value, keep it null if it is a String
+	 * or -1 if it is an int.
+	 * 
+	 * @param oldDepartment
+	 * @param oldNumber
+	 * @param newDepartment
+	 * @param newNumber
+	 * @param newTitle
+	 * @param newUnits
+	 * @param newCost
+	 * @return
+	 */
+	public static boolean updateCourse(String oldDepartment, String oldNumber, String newDepartment, String newNumber,
+			String newTitle, int newUnits, int newCost) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (oldDepartment == null || oldNumber == null) return false; // PK cannot be null
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			HashMap<String, String> course = search(oldDepartment, oldNumber); // Search for course to update
+			if (newDepartment == null) newDepartment = oldDepartment; // Determine if we want to change old value
+			if (newNumber == null) newDepartment = oldNumber; // Determine if we want to change old value
+			if (newTitle == null) newTitle = course.get("title"); // Determine if we want to change old value
+			if (newUnits == -1) newUnits = Integer.parseInt(course.get("units"));
+			if (newCost == -1) newCost = Integer.parseInt(course.get("cost"));
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Courses SET department = ? AND number = ? AND title = ? AND units ? AND cost = ? WHERE department = ? AND number = ?;");
+			pstate.setString(1, newDepartment);
+			pstate.setString(2, newNumber);
+			pstate.setString(3, newTitle);
+			pstate.setInt(4, newUnits);
+			pstate.setInt(5, newCost);
+			pstate.setString(6, oldDepartment);
+			pstate.setString(7, oldNumber);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	/** Update a course's department */
 	public static boolean updateDepartment(String oldDepartment, String number, String newDepartment) {
@@ -167,36 +241,6 @@ public class Courses {
 			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
 		}
 		return false; // Return false as a default value
-	}
-
-	// Search
-
-	public static ArrayList<ArrayList<String>> search(String department, String number) {
-		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
-		if (department == null) return output; // Check if department is null, return empty list if so
-		if (number == null) return output; // Check if number is null, return empty list if so
-		SQLMethods.mysqlConnect(); // Connect to DB
-		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * Courses WHERE department = ? AND number = ?");
-			pstate.setString(1, department);
-			pstate.setString(1, number);
-			result = pstate.executeQuery(); // Execute query
-			SQLMethods.closeConnection(); // Close connection
-			while (result.next()) {
-				ArrayList<String> tuple = new ArrayList<String>();
-				tuple.add(result.getString("department"));
-				tuple.add(result.getString("number"));
-				tuple.add(result.getString("title"));
-				tuple.add(result.getString("units"));
-				tuple.add(result.getString("cost"));
-				output.add(tuple);
-			}
-			result.close(); // Close result
-			return output; // Success
-		} catch (SQLException e) {
-			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
-		}
-		return output; // Return false as a default value
 	}
 
 	public static ArrayList<ArrayList<String>> searchDepartment(String department) {

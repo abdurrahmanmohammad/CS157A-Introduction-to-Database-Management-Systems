@@ -42,7 +42,7 @@ public class Transactions {
 		} catch (SQLException e) {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-		return false; // Return false as a default value
+		return false; // Default value: false
 	}
 
 	/**
@@ -73,7 +73,6 @@ public class Transactions {
 			SQLMethods.mysql_fatal_error("Query error"); // Print error and exit
 		}
 		return output; // default value
-
 	}
 
 }

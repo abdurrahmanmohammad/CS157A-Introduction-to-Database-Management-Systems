@@ -103,7 +103,9 @@ public class Teaches {
 		return output; // Default value: empty list
 	}
 
-	/** #################### Unused Methods Below #################### */
+	/* ############################################################ */
+	/* #################### Unused Methods Below #################### */
+	/* ############################################################ */
 
 	/**
 	 * Get all tuples as HashMap in the table Teaches in an ArrayList

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import SQL.SQLMethods;
 
-// Instructors(ID, status)
+/** Instructors(instructorID, status) */
 public class Instructors {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
@@ -16,14 +16,14 @@ public class Instructors {
 	 * Method to create and insert a student in the DB. Returns true if successful,
 	 * otherwise false.
 	 */
-	public static boolean insert(String ID, String status) {
+	public static boolean insert(String instructorID, String status) {
 		// Check if inputs are null
-		if (ID == null) return false; // Attribute ID is null
+		if (instructorID == null) return false; // Attribute instructorID is null
 		if (status == null) return false; // Attribute status is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Instructors(ID, status)" + "values(?, ?)");
-			pstate.setString(1, ID);
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Instructors(instructorID, status)" + "values(?, ?)");
+			pstate.setString(1, instructorID);
 			pstate.setString(2, status);
 			int value = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
@@ -35,15 +35,15 @@ public class Instructors {
 	}
 
 	/**
-	 * Method to delete a user using ID. Returns true if successful, otherwise
+	 * Method to delete a user using instructorID. Returns true if successful, otherwise
 	 * false.
 	 */
-	public static boolean delete(String ID) {
-		if (ID == null) return false; // Check if ID is null
+	public static boolean delete(String instructorID) {
+		if (instructorID == null) return false; // Check if instructorID is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Instructors WHERE ID = ?");
-			pstate.setString(1, ID);
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Instructors WHERE instructorID = ?");
+			pstate.setString(1, instructorID);
 			int value = pstate.executeUpdate();
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Success
@@ -53,14 +53,14 @@ public class Instructors {
 		return false; // Return false as a default value
 	}
 
-	public static boolean updateStatus(String ID, String status) {
-		if (ID == null) return false; // Check if ID is null
+	public static boolean updateStatus(String instructorID, String status) {
+		if (instructorID == null) return false; // Check if instructorID is null
 		if (status == null) return false; // Check if unit_cap is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Instructors SET status = ? WHERE ID = ?");
+			pstate = SQLMethods.con.prepareStatement("UPDATE Instructors SET status = ? WHERE instructorID = ?");
 			pstate.setString(1, status); // New status
-			pstate.setString(2, ID); // ID of user
+			pstate.setString(2, instructorID); // instructorID of user
 			int value = pstate.executeUpdate(); // Execute statement
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Success
@@ -81,7 +81,7 @@ public class Instructors {
 			SQLMethods.closeConnection(); // Close connection
 			while (result.next()) {
 				ArrayList<String> tuple = new ArrayList<String>();
-				tuple.add(result.getString("ID"));
+				tuple.add(result.getString("instructorID"));
 				tuple.add(result.getString("status"));
 				output.add(tuple);
 			}
