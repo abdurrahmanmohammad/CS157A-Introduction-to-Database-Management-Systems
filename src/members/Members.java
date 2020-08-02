@@ -125,7 +125,7 @@ public class Members {
 		return output; // Default value: empty HashMap
 	}
 
-	public static boolean updateMember(String ID, String firstname, String lastname, String phone, String email,
+	public static boolean update(String ID, String firstname, String lastname, String phone, String email,
 			String address) {
 		/** Check for invalid inputs. If any input is null, return false */
 		if (ID == null) return false; // Check if ID is null
