@@ -38,6 +38,6 @@ public class SQLMethods {
 	/** Customized error function */
 	public static void mysql_fatal_error(String error) {
 		System.out.println(error); // We want to print this to the browser
-		System.exit(1); // Exit with error
+		//System.exit(1); // Exit with error
 	}
 }

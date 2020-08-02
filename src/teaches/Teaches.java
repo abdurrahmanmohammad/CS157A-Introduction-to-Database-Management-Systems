@@ -77,9 +77,10 @@ public class Teaches {
 	 */
 	public static ArrayList<HashMap<String, String>> getCourses() {
 		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
 			pstate = SQLMethods.con.prepareStatement(
-					"SELECT * FROM Teaches JOIN Members Using (instructorID) JOIN Configurations Using (configID) ORDER BY year DESC;");
+					"SELECT * FROM Teaches JOIN Members ON instructorID = ID JOIN Configurations Using (configID) ORDER BY year DESC;");
 			result = pstate.executeQuery(); // Execute query
 			while (result.next()) {
 				HashMap<String, String> tuple = new HashMap<String, String>();
@@ -92,6 +93,7 @@ public class Teaches {
 				tuple.put("days", result.getString("days"));
 				tuple.put("time", result.getString("time"));
 				tuple.put("room", result.getString("room"));
+				tuple.put("configID", Integer.toString(result.getInt("configID")));
 				output.add(tuple);
 			}
 			result.close(); // Close result

@@ -43,8 +43,11 @@ body {
 	<div class="topnav">
 		<%String username = request.getParameter("username");%>
 		<%String studentID = Users.getID(username);%>
-		<a class="active" href="/CMS/index.jsp">Course Management System</a> <a
-			href="studentCourses.jsp">View Courses</a> <a href="login.jsp">Register/Drop</a>
+		<a class="active" href="/CMS/index.jsp">Course Management System</a> 
+		<a href=<%="add.jsp?studentID="+studentID%>>Add Courses</a>
+		<a href=<%="drop.jsp?studentID="+studentID%>>Drop Courses</a>
+		<a href="viewCourses.jsp">View Courses</a>
+		<a href=<%="transcript.jsp?studentID="+studentID%>>Transcript</a>
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="login.jsp">Account Management</a> <a href="/CMS/index.jsp">Logout</a>
 	</div>
