@@ -4,10 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Instructor Portal</title>
+<link href="portal.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 	<h1>Instructor Portal</h1>
-	<table style="with: 50%">
+	<table class="content-table">
 		<tr>
 			<td>
 				<%String username = request.getParameter("username");%> 

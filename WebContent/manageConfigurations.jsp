@@ -5,79 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Manage Configurations</title>
-<style>
-body {
-	background: url(pictures/studentPortal.jpg) no-repeat;
-	background-size: cover;
-	margin: 0;
-	padding: 0;
-	font-family: Arial, Helvetica, sans-serif;
-}
-
-.topnav {
-	overflow: hidden;
-	background-color: #030024;
-}
-
-.topnav a {
-	float: left;
-	color: #f2f2f2;
-	text-align: center;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
-}
-
-.topnav a:hover {
-	background-color: #ddd;
-	color: black;
-}
-
-.topnav a.active {
-	background-color: #010d42;
-	color: white;
-}
-.content-table {
-  border-collapse: collapse;
-  margin: 25px 0;
-  font-size: 0.9em;
-  min-width: 400px;
-  border-radius: 5px 5px 0 0;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
-
-.content-table thead tr {
-  background-color: #003398;
-  color: #ffffff;
-  text-align: center;
-  font-weight: bold;
-}
-
-.content-table th,.content-table td {
-  padding: 12px 15px;
-}
-
-.content-table tbody tr {
-  border-bottom: 1px solid #000000;
-}
-
-.content-table tbody tr:nth-of-type(even) {
-  background-color: #e3e4e6;
-}
-
-.content-table tbody tr:nth-of-type(odd) {
-  background-color: #f0f2f5;
-}
-
-.content-table tbody tr.active-row {
-  font-weight: bold;
-  color: #003398;
-}
-</style>
+<link href="portal.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 	<% String adminID = request.getParameter("adminID");%>	
@@ -138,7 +66,7 @@ body {
 	</table>
 	<h1>Create Configuration</h1>
 	<form action="insertConfiguration" method="post">
-<table>
+<table class="content-table">
 	<tr>
 		<td>Term</td>
 		<td><input type="text" id="term" name="term"><td>

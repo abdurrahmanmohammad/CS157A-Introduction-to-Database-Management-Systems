@@ -6,39 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Update Instructors</title>
-<style>
-body {
-	background: url(pictures/studentPortal.jpg) no-repeat;
-	background-size: cover;
-	margin: 0;
-	padding: 0;
-	font-family: Arial, Helvetica, sans-serif;
-}
-
-.topnav {
-	overflow: hidden;
-	background-color: #030024;
-}
-
-.topnav a {
-	float: left;
-	color: #f2f2f2;
-	text-align: center;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
-}
-
-.topnav a:hover {
-	background-color: #ddd;
-	color: black;
-}
-
-.topnav a.active {
-	background-color: #010d42;
-	color: white;
-}
-</style>
+<link href="portal.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 	<% String instructorID = request.getParameter("instructorID");%>
@@ -55,7 +23,7 @@ body {
 		<a href="index.jsp">Logout</a>
 	</div>
 <form action="updateInstructor" method="post">
-<table>
+<table class="content-table">
 	<tr>
 		<td><%="Name: " + request.getParameter("firstname") + " " + request.getParameter("lastname")%></td>
 		<td><input type="hidden" id="oldInstructorID" name="oldInstructorID" value=<%=instructorID%>></td>
@@ -73,7 +41,7 @@ body {
 </form> 
 
 <h1>Courses Taught</h1>
-	<table style="width: 100%">
+	<table class="content-table">
 		<tr>
 			<td>InstructorID</td>
 			<td>Department</td>
