@@ -84,6 +84,14 @@ public class Users {
 		}
 		return 0; // Return 0 as a default value
 	}
+	
+	public static String mapType(int type) {
+		if(type == 0) return "None";
+		else if(type == 1) return "Administrator";
+		else if(type == 2) return "Instructor";
+		else if(type == 3) return "Student";
+		else return "DNE";
+	}
 
 	/**
 	 * Method to create and insert a user in the DB. Returns true if successful,
@@ -170,18 +178,15 @@ public class Users {
 		return ""; // Default value: empty String
 	}
 
-	public static boolean update(String ID, String username, String password) {
+	public static boolean update(String oldID, String newID, String username, String password) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (ID == null) return false; // Check if ID is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			HashMap<String, String> member = search(ID); // Search for member to update
-			if (username == null) username = member.get("username"); // Determine if we want to change old value
-			if (password == null) password = member.get("password"); // Determine if we want to change old value
-			pstate = SQLMethods.con.prepareStatement("UPDATE Users SET username = ? AND password = ? WHERE ID = ?;");
-			pstate.setString(1, username);
-			pstate.setString(2, password);
-			pstate.setString(3, ID);
+			pstate = SQLMethods.con.prepareStatement("UPDATE Users SET ID = ?, username = ?, password = ? WHERE ID = ?;");
+			pstate.setString(1, newID);
+			pstate.setString(2, username);
+			pstate.setString(3, password);
+			pstate.setString(4, oldID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted

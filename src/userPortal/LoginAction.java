@@ -53,9 +53,12 @@ public class LoginAction extends HttpServlet {
 				} else if (type == 2) { // If the user is an instructor
 					RequestDispatcher req = request.getRequestDispatcher("InstructorPortal.jsp");
 					req.forward(request, response);
-				} else { // If the user is a student
+				} else if (type == 3){ // If the user is a student
 					RequestDispatcher req = request.getRequestDispatcher("studentPortal.jsp");
 					req.forward(request, response);
+				} else { // If member does not have an account (not approved by admin)
+					RequestDispatcher req = request.getRequestDispatcher("confirmation.jsp");
+					req.include(request, response);
 				}
 			} else { // If incorrect, go to invalid login page
 				RequestDispatcher req = request.getRequestDispatcher("invalidLogin.jsp");

@@ -57,7 +57,7 @@ public class Teaches {
 		try { // Attempt to delete
 			pstate = SQLMethods.con.prepareStatement(
 					"DELETE FROM Teaches WHERE instructorID = ? AND department = ? AND number = ? AND configID = ?;");
-			pstate.setString(3, instructorID);
+			pstate.setString(1, instructorID);
 			pstate.setString(2, department);
 			pstate.setString(3, number);
 			pstate.setString(4, configID);
@@ -102,6 +102,23 @@ public class Teaches {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Default value: empty list
+	}
+
+	public static boolean dropAll(String instructorID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (instructorID == null) return false;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to delete
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Teaches WHERE instructorID = ?;");
+			pstate.setString(1, instructorID);
+			pstate.executeUpdate(); // Execute query
+			SQLMethods.closeConnection(); // Close connection
+			return true; // Successful insert
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+
 	}
 
 	/* ############################################################ */

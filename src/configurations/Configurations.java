@@ -142,9 +142,9 @@ public class Configurations {
 	}
 	
 	/**
-	 * Method to retrieve all the configurations and their info in table Courses
+	 * Method to retrieve all the configurations and their info in table Configurations
 	 * 
-	 * @return all the configurations and their info in table cCnfigurations in an ArrayList
+	 * @return all the configurations and their info in table Configurations in an ArrayList
 	 */
 	public static ArrayList<HashMap<String, String>> getAll() {
 		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();

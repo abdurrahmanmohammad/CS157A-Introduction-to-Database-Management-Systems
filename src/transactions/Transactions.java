@@ -62,7 +62,8 @@ public class Transactions {
 		if (studentID == null) return output; // Return empty list
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
-			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Transactions WHERE studentID = ? ORDER BY timestamp DESC;");
+			pstate = SQLMethods.con
+					.prepareStatement("SELECT * FROM Transactions WHERE studentID = ? ORDER BY timestamp DESC;");
 			pstate.setString(1, studentID);
 			result = pstate.executeQuery(); // Execute query
 			while (result.next()) {
@@ -80,6 +81,23 @@ public class Transactions {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // default value
+	}
+
+	public static boolean deleteAll(String studentID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null) return false;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to delete
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Transactions WHERE studentID = ?;");
+			pstate.setString(1, studentID);
+			pstate.executeUpdate(); // Execute query
+			SQLMethods.closeConnection(); // Close connection
+			return true; // Successful insert
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+
 	}
 
 }

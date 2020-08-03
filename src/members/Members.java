@@ -3,6 +3,7 @@ package members;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import SQL.SQLMethods;
@@ -125,26 +126,20 @@ public class Members {
 		return output; // Default value: empty HashMap
 	}
 
-	public static boolean update(String ID, String firstname, String lastname, String phone, String email,
-			String address) {
+	public static boolean update(String oldID, String newID, String firstname, String lastname, String phone,
+			String email, String address) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (ID == null) return false; // Check if ID is null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			HashMap<String, String> member = search(ID); // Search for member to update
-			if (firstname == null) firstname = member.get("firstname"); // Determine if we want to change old value
-			if (lastname == null) lastname = member.get("lastname"); // Determine if we want to change old value
-			if (phone == null) phone = member.get("phone"); // Determine if we want to change old value
-			if (email == null) email = member.get("email"); // Determine if we want to change old value
-			if (address == null) address = member.get("address"); // Determine if we want to change old value
 			pstate = SQLMethods.con.prepareStatement(
-					"UPDATE Members SET firstname = ? AND lastname = ? AND phone = ? AND email ? AND address = ? WHERE ID = ?;");
-			pstate.setString(1, firstname);
-			pstate.setString(2, lastname);
-			pstate.setString(3, phone);
-			pstate.setString(4, email);
-			pstate.setString(5, address);
-			pstate.setString(6, ID);
+					"UPDATE Members SET ID = ?, firstname = ?, lastname = ?, phone = ?, email = ?, address = ? WHERE ID = ?;");
+			pstate.setString(1, newID);
+			pstate.setString(2, firstname);
+			pstate.setString(3, lastname);
+			pstate.setString(4, phone);
+			pstate.setString(5, email);
+			pstate.setString(6, address);
+			pstate.setString(7, oldID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
@@ -152,6 +147,37 @@ public class Members {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return false; // Default value: false
+	}
+
+	/**
+	 * Method to retrieve all the members and their info in table Members
+	 * 
+	 * @return all the members and their info in table Members in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Members NATURAL JOIN Users ORDER BY lastname ASC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("ID", result.getString("ID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				tuple.put("phone", result.getString("phone"));
+				tuple.put("email", result.getString("email"));
+				tuple.put("address", result.getString("address"));
+				tuple.put("username", result.getString("username"));
+				tuple.put("password", result.getString("password"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
 	}
 
 	/* ############################################################ */

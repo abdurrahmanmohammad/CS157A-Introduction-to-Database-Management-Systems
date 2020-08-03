@@ -9,7 +9,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import administrators.Administrators;
+import instructors.Instructors;
 import members.Members;
+import students.Students;
 
 /**
  * Servlet implementation class registerAction
@@ -37,6 +41,7 @@ public class registerAction extends HttpServlet {
 		String phone = request.getParameter("phone");
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
+		String type = request.getParameter("type");
 		// If any fields are empty, return back to the form
 		if (firstname.isEmpty() || lastname.isEmpty() || phone.isEmpty() || email.isEmpty() || address.isEmpty()) {
 			RequestDispatcher req = request.getRequestDispatcher("register.jsp"); // Return to the form
@@ -49,6 +54,13 @@ public class registerAction extends HttpServlet {
 			while (!Members.checkID(ID)) // Keep on generating until find an ID that DNE
 				ID = Integer.toString(rand.nextInt(1000000000)); // Generate ID (9 digits)
 			Members.insert(ID, firstname, lastname, phone, email, address); // Add member to DB
+			if (type.equalsIgnoreCase("administrator")) {
+				Administrators.insert(ID, 0);
+			} else if (type.equalsIgnoreCase("instructor")) {
+				Instructors.insert(ID, "Inactive");
+			} else { // Student
+				Students.insert(ID, 0, 12); // Initial unit cap is 12
+			}
 			RequestDispatcher req = request.getRequestDispatcher("confirmation.jsp"); // Go to confirmation page
 			req.forward(request, response);
 		}

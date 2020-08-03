@@ -27,21 +27,20 @@
 			<td><%=course.get("number")%></td>
 			<td><%=course.get("title")%></td>
 			<td><%=course.get("units")%></td>
-			<td><%=course.get("cost")%></td>
+			<td><%=course.get("cost")%></td>			
 			<td>
-			<td>
-			<form action="updateCourse.jsp" method="post">
-				<input type="hidden" id="department" name="department" value=<%=course.get("department")%>>
-				<input type="hidden" id="number" name="number" value=<%=course.get("number")%>>
-				<input type="submit" value="Update">
-			</form>
+				<form action="updateCourse.jsp" method="post">
+					<input type="hidden" id="department" name="department" value=<%=course.get("department")%>>
+					<input type="hidden" id="number" name="number" value=<%=course.get("number")%>>
+					<input type="submit" value="Update">
+				</form>
 			</td>
 			<td>
-			<form action="deleteCourse" method="post">
-				<input type="hidden" id="department" name="department" value=<%=course.get("department")%>>
-				<input type="hidden" id="number" name="number" value=<%=course.get("number")%>>
-				<input type="submit" value="Delete">
-			</form>
+				<form action="deleteCourse" method="post">
+					<input type="hidden" id="department" name="department" value=<%=course.get("department")%>>
+					<input type="hidden" id="number" name="number" value=<%=course.get("number")%>>
+					<input type="submit" value="Delete">
+				</form>
 			</td>
 		</tr>
 		<%

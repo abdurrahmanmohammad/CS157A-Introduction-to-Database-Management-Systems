@@ -157,7 +157,7 @@ public class Registers {
 				pstate.setString(3, number);
 				pstate.setString(4, configID);
 				int value = pstate.executeUpdate();
-				
+
 				/** Adjust the watlist if needed */
 				adjustWaitlist(studentID, studentID, number, configID);
 			}
@@ -170,8 +170,8 @@ public class Registers {
 	}
 
 	/**
-	 * If someone is on the Registers and drops, the next person on the waitlist will
-	 * get that course. Bump up the waitlist.
+	 * If someone is on the Registers and drops, the next person on the waitlist
+	 * will get that course. Bump up the waitlist.
 	 * 
 	 * @param department
 	 * @param number
@@ -280,6 +280,32 @@ public class Registers {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Return false as a default value
+	}
+
+	/**
+	 * Drop all courses (registered and waitlisted)
+	 * 
+	 * @param studentID
+	 * @return
+	 */
+	public static boolean dropAll(String studentID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null) return false;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to delete
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Registers WHERE studentID = ?;");
+			pstate.setString(1, studentID);
+			pstate.executeUpdate(); // Execute query
+			pstate = SQLMethods.con.prepareStatement("DELETE FROM Waitlists WHERE studentID = ?;");
+			pstate.setString(1, studentID);
+			pstate.executeUpdate(); // Execute query
+			SQLMethods.closeConnection(); // Close connection
+			return true; // Successful insert
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+
 	}
 
 }

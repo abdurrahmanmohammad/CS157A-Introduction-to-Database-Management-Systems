@@ -113,6 +113,7 @@ textarea.contact-form-text {
 			<input type="text" class="contact-form-text" placeholder="Phone" name="phone">
 			<input type="text" class="contact-form-text" placeholder="Email" name="email">
 			<input type="text" class="contact-form-text" placeholder="Address" name="address">
+			<input type="text" class="contact-form-text" placeholder="Type" name="type">
 			<input type="submit" class="contact-form-btn" value="submit">
 		</form>
 	</div>
