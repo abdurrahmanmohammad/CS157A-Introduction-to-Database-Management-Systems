@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import SQL.SQLMethods;
 
@@ -74,6 +75,51 @@ public class Instructors {
 			pstate.setString(1, newStatus); // New status
 			pstate.setString(2, instructorID); // instructorID of user
 			int rowcount = pstate.executeUpdate();
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	/**
+	 * Method to retrieve all the instructors and their info
+	 * 
+	 * @return all the instructors and their info in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Instructors JOIN Members ON instructorID = ID ORDER BY lastname ASC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("instructorID", result.getString("instructorID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				tuple.put("status", result.getString("status"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
+	}
+
+	public static boolean update(String oldInstructorID, String newInstructorID, String status) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Instructors SET instructorID = ?, status = ? WHERE instructorID = ?;");
+			pstate.setString(1, newInstructorID);
+			pstate.setString(2, status);
+			pstate.setString(3, oldInstructorID);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
 		} catch (SQLException e) { // Print error and terminate program

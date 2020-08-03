@@ -54,14 +54,15 @@ public class Students {
 		return false; // Default value: false
 	}
 
-	public static boolean updateUnitCap(String studentID, int unit_cap) {
-		/** Check for invalid inputs. If any input is null, return false */
-		if (studentID == null || unit_cap < 0) return false;
+	public static boolean update(String oldStudentID, String newStudentID, int balance, int unit_cap) {
 		SQLMethods.mysqlConnect(); // Connect to DB
-		try { // Attempt to update
-			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET unit_cap = ? WHERE studentID = ?;");
-			pstate.setInt(1, unit_cap); // New username
-			pstate.setString(2, studentID); // ID of user
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Students SET studentID = ?, balance = ?, unit_cap = ? WHERE studentID = ?;");
+			pstate.setString(1, newStudentID);
+			pstate.setInt(2, balance);
+			pstate.setInt(3, unit_cap);
+			pstate.setString(4, oldStudentID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
@@ -116,9 +117,55 @@ public class Students {
 		return output; // default value
 	}
 
+	/**
+	 * Method to retrieve all the students and their info
+	 * 
+	 * @return all the students and their info in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con
+					.prepareStatement("SELECT * FROM Students JOIN Members ON studentID = ID ORDER BY lastname ASC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("studentID", result.getString("studentID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				tuple.put("balance", Integer.toString(result.getInt("balance")));
+				tuple.put("unit_cap", Integer.toString(result.getInt("unit_cap")));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
+	}
+
 	/* ############################################################ */
 	/* #################### Unused Methods Below #################### */
 	/* ############################################################ */
+
+	public static boolean updateUnitCap(String studentID, int unit_cap) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || unit_cap < 0) return false;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET unit_cap = ? WHERE studentID = ?;");
+			pstate.setInt(1, unit_cap); // New username
+			pstate.setString(2, studentID); // ID of user
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
 
 	public static ArrayList<ArrayList<String>> searchByBalance(int balance) {
 		ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>();

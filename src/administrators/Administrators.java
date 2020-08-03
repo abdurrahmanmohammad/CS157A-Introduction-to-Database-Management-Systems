@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import SQL.SQLMethods;
 
@@ -112,6 +113,51 @@ public class Administrators {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return -1; // Default value: -1
+	}
+
+	public static boolean update(String oldAdminID, String newAdminID, int clearance) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con
+					.prepareStatement("UPDATE Administrators SET adminID = ?, clearance = ? WHERE adminID = ?;");
+			pstate.setString(1, newAdminID);
+			pstate.setInt(2, clearance);
+			pstate.setString(3, oldAdminID);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	/**
+	 * Method to retrieve all the administrators and their info
+	 * 
+	 * @return all the students and their info in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con
+					.prepareStatement("SELECT * FROM Administrators JOIN Members ON adminID = ID ORDER BY lastname ASC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("adminID", result.getString("adminID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				tuple.put("clearance", Integer.toString(result.getInt("clearance")));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
 	}
 
 	/* ############################################################ */

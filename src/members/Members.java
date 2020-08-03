@@ -128,7 +128,6 @@ public class Members {
 
 	public static boolean update(String oldID, String newID, String firstname, String lastname, String phone,
 			String email, String address) {
-		/** Check for invalid inputs. If any input is null, return false */
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
 			pstate = SQLMethods.con.prepareStatement(
