@@ -95,8 +95,7 @@ body {
 		ArrayList<HashMap<String, String>> courses = Teaches.getCourses();
 	for (int i = 0; i < courses.size(); i++) {
 		HashMap<String, String> course = courses.get(i);
-	%>
-		 
+	%>	 
 			<tr>
 				<td><%=course.get("term")%></td>
 				<td><%=course.get("year")%></td>
@@ -107,7 +106,7 @@ body {
 				<td><%=course.get("days")%></td>
 				<td><%=course.get("time")%></td>
 				<td>
-					<form action="/CMS/addCourse" method="post">
+					<form action="addCourse" method="post">
 					<input type="submit" value="Add">
 					<input type="hidden" id="studentID" name="studentID" value=<%=studentID%>>
 					<input type="hidden" id="configID" name="configID" value=<%=course.get("configID")%>>

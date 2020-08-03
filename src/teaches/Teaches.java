@@ -101,7 +101,6 @@ public class Teaches {
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
-
 		return output; // Default value: empty list
 	}
 

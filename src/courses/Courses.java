@@ -68,6 +68,7 @@ public class Courses {
 
 	/**
 	 * Method to search for a course using its PK
+	 * 
 	 * @param department
 	 * @param number
 	 * @return a HashMap containing the attributes of the course
@@ -87,7 +88,9 @@ public class Courses {
 			result.next();
 			output.put("department", result.getString("department"));
 			output.put("number", result.getString("number"));
-			output.put("clearance", Integer.toString(result.getInt("clearance")));
+			output.put("title", result.getString("title"));
+			output.put("units", Integer.toString(result.getInt("units")));
+			output.put("cost", Integer.toString(result.getInt("cost")));
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Return output
@@ -114,17 +117,23 @@ public class Courses {
 	public static boolean updateCourse(String oldDepartment, String oldNumber, String newDepartment, String newNumber,
 			String newTitle, int newUnits, int newCost) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (oldDepartment == null || oldNumber == null) return false; // PK cannot be null
+		if (oldDepartment == null || oldNumber == null || newDepartment == null || newNumber == null || newTitle == null
+				|| newUnits < 0 || newCost < 0)
+			return false; // PK cannot be null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
 			HashMap<String, String> course = search(oldDepartment, oldNumber); // Search for course to update
-			if (newDepartment == null) newDepartment = oldDepartment; // Determine if we want to change old value
-			if (newNumber == null) newDepartment = oldNumber; // Determine if we want to change old value
-			if (newTitle == null) newTitle = course.get("title"); // Determine if we want to change old value
-			if (newUnits == -1) newUnits = Integer.parseInt(course.get("units"));
-			if (newCost == -1) newCost = Integer.parseInt(course.get("cost"));
+			/*
+			 * if (newDepartment == null) newDepartment = oldDepartment; // Determine if we
+			 * want to change old value if (newNumber == null) newDepartment = oldNumber; //
+			 * Determine if we want to change old value if (newTitle == null) newTitle =
+			 * course.get("title"); // Determine if we want to change old value if (newUnits
+			 * == -1) newUnits = Integer.parseInt(course.get("units")); if (newCost == -1)
+			 * newCost = Integer.parseInt(course.get("cost"));
+			 */
+			SQLMethods.mysqlConnect(); // Connect to DB
 			pstate = SQLMethods.con.prepareStatement(
-					"UPDATE Courses SET department = ? AND number = ? AND title = ? AND units ? AND cost = ? WHERE department = ? AND number = ?;");
+					"UPDATE Courses SET department = ?, number = ?, title = ?, units = ?, cost = ? WHERE department = ? AND number = ?;");
 			pstate.setString(1, newDepartment);
 			pstate.setString(2, newNumber);
 			pstate.setString(3, newTitle);
@@ -139,6 +148,36 @@ public class Courses {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return false; // Default value: false
+	}
+
+	/**
+	 * Method to retrieve all the courses and their info in table Courses
+	 * 
+	 * @return all the courses and their info in table Courses in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Courses ORDER BY department ASC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("department", result.getString("department"));
+				tuple.put("number", result.getString("number"));
+				tuple.put("title", result.getString("title"));
+				tuple.put("units", Integer.toString(result.getInt("units")));
+				tuple.put("cost", Integer.toString(result.getInt("cost")));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+
+		return output;
+
 	}
 
 	/* ############################################################ */
