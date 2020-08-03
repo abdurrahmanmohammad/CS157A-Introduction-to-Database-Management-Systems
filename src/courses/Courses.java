@@ -27,7 +27,7 @@ public class Courses {
 		if (department == null || number == null || title == null || units < 0 || cost < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?, ?);");
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Courses Values (?, ?, ?, ?, ?);");
 			pstate.setString(1, department);
 			pstate.setString(2, number);
 			pstate.setString(3, title);

@@ -48,6 +48,32 @@
 			}
 		%>
 	</table>
+	<h1>Create Course</h1>
+	<form action="insertCourse" method="post">
+<table>
+	<tr>
+		<td>Department</td>
+		<td><input type="text" id="department" name="department"><td>
+	</tr>
+	<tr>
+		<td>Number</td>
+		<td><input type="text" id="number" name="number"><td>
+	</tr>
+	<tr>
+		<td>Title</td>
+		<td><input type="text" id="title" name="title"><td>
+	</tr>
+	<tr>
+		<td>Units</td>
+		<td><input type="text" id="units" name="units"><td>
+	</tr>
+	<tr>
+		<td>Cost</td>
+		<td><input type="text" id="cost" name="cost"><td>
+	</tr>
+	<tr><td><input type="submit" value="Submit"></td></tr>
+</table>
+</form> 
 	
 </body>
 </html>
