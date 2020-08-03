@@ -105,7 +105,7 @@ public class Members {
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
 			/** Search for member using ID */
-			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Members WHERE ID = ?");
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Members NATURAL JOIN Users WHERE ID = ?");
 			pstate.setString(1, ID); // ID of member
 			result = pstate.executeQuery(); // Execute query
 			/** Extract member data */
@@ -117,6 +117,8 @@ public class Members {
 			output.put("phone", result.getString("phone"));
 			output.put("email", result.getString("email"));
 			output.put("address", result.getString("address"));
+			output.put("username", result.getString("username"));
+			output.put("password", result.getString("password"));
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Success

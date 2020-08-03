@@ -46,19 +46,19 @@ body {
 		String studentID = request.getParameter("studentID"); // get ID from previous page
 	%>
 	<div class="topnav">
-		<a class="active" href=<%="/CMS/studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
+		<a class="active" href=<%="studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
 		<a href=<%="add.jsp?studentID=" + studentID%>>Add Courses</a> 
 		<a href=<%="drop.jsp?studentID=" + studentID%>>Drop Courses</a> 
 		<a href=<%="viewCourses.jsp?studentID="+studentID%>>View Courses</a>
 		<a href=<%="transcript.jsp?studentID=" + studentID%>>Transcript</a> 
 		<a href=<%="transactions.jsp?studentID=" + studentID%>>Transactions</a> 
-		<a href="/CMS/index.jsp">Logout</a>
+		<a href="index.jsp">Logout</a>
 	</div>
 	<%
 		ArrayList<HashMap<String, String>> transactions = Transactions.viewTransactions(studentID);
 	%>
 	<h1>Make a Transaction:</h1>
-	<form action="/CMS/transactionAction" method="post">
+	<form action="transactionAction" method="post">
 		<label for="credit card">Credit Card:</label><br> <input
 			type="text" id="creditcard" name="creditcard"><br> <label
 			for="amount">Amount:</label><br> <input type="text" id="amount"

@@ -27,6 +27,7 @@ public class Teaches {
 		/** Insert tuple */
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
+			if (isTeaching(instructorID, department, number, configID)) return false; // If teacher tries to add the same course twice
 			pstate = SQLMethods.con.prepareStatement("INSERT INTO Teaches VALUES (?, ?, ?, ?);");
 			pstate.setString(3, instructorID);
 			pstate.setString(2, department);
@@ -39,6 +40,24 @@ public class Teaches {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return false; // Default value: false
+	}
+
+	private static boolean isTeaching(String instructorID, String department, String number, String configID)
+			throws SQLException {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (instructorID == null || department == null || number == null || configID == null) return false;
+		pstate = SQLMethods.con.prepareStatement(
+				"SELECT COUNT(*) FROM Teaches WHERE instructorID = ? AND department = ? AND number = ? AND configID = ?;");
+		pstate.setString(3, instructorID);
+		pstate.setString(2, department);
+		pstate.setString(3, number);
+		pstate.setString(4, configID);
+		result = pstate.executeQuery();
+		result.next();
+		int rowcount = result.getInt(1); // Get row count
+		result.close(); // Close result
+		SQLMethods.closeConnection(); // Close connection to DB
+		return (rowcount == 1); // If rowcount == 1, instructor is teaching this course
 	}
 
 	/**
@@ -120,7 +139,7 @@ public class Teaches {
 		return false; // Default value: false
 
 	}
-	
+
 	public static ArrayList<HashMap<String, String>> viewTaughtCourses(String instructorID) {
 		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
 		/** Check for invalid inputs. If any input is null, return false */
@@ -153,7 +172,6 @@ public class Teaches {
 		}
 		return output; // Return false as a default value
 	}
-
 
 	/* ############################################################ */
 	/* #################### Unused Methods Below #################### */

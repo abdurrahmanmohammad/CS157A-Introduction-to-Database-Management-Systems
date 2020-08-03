@@ -48,7 +48,7 @@ public class LoginAction extends HttpServlet {
 				// 1 = Administrator, 2 = Instructor, 3 = Student
 				/** Redirect to respective portal/page */
 				if (type == 1) { // If the user is an administrator
-					RequestDispatcher req = request.getRequestDispatcher("AdministratorPortal.jsp");
+					RequestDispatcher req = request.getRequestDispatcher("administratorPortal.jsp");
 					req.forward(request, response);
 				} else if (type == 2) { // If the user is an instructor
 					RequestDispatcher req = request.getRequestDispatcher("InstructorPortal.jsp");
