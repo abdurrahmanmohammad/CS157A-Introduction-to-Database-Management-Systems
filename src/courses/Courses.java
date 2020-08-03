@@ -114,7 +114,7 @@ public class Courses {
 	 * @param newCost
 	 * @return
 	 */
-	public static boolean updateCourse(String oldDepartment, String oldNumber, String newDepartment, String newNumber,
+	public static boolean update(String oldDepartment, String oldNumber, String newDepartment, String newNumber,
 			String newTitle, int newUnits, int newCost) {
 		/** Check for invalid inputs. If any input is null, return false */
 		if (oldDepartment == null || oldNumber == null || newDepartment == null || newNumber == null || newTitle == null
@@ -122,8 +122,8 @@ public class Courses {
 			return false; // PK cannot be null
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			HashMap<String, String> course = search(oldDepartment, oldNumber); // Search for course to update
 			/*
+			 * HashMap<String, String> course = search(oldDepartment, oldNumber); // Search for course to update
 			 * if (newDepartment == null) newDepartment = oldDepartment; // Determine if we
 			 * want to change old value if (newNumber == null) newDepartment = oldNumber; //
 			 * Determine if we want to change old value if (newTitle == null) newTitle =
@@ -131,7 +131,6 @@ public class Courses {
 			 * == -1) newUnits = Integer.parseInt(course.get("units")); if (newCost == -1)
 			 * newCost = Integer.parseInt(course.get("cost"));
 			 */
-			SQLMethods.mysqlConnect(); // Connect to DB
 			pstate = SQLMethods.con.prepareStatement(
 					"UPDATE Courses SET department = ?, number = ?, title = ?, units = ?, cost = ? WHERE department = ? AND number = ?;");
 			pstate.setString(1, newDepartment);

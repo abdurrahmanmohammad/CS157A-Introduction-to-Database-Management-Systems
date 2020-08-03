@@ -71,14 +71,14 @@ public class Configurations {
 	 * @param ID
 	 * @return
 	 */
-	public static HashMap<String, String> search(String configID) {
+	public static HashMap<String, String> search(int oldConfigID) {
 		HashMap<String, String> output = new HashMap<String, String>();
-		if (configID == null) return output; // Check if ID is null, return empty list if so
+		if (oldConfigID < 0) return output; // Check if ID is null, return empty list if so
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
 			/** Search and retrieve tuple */
 			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Configurations WHERE configID = ?;");
-			pstate.setString(1, configID);
+			pstate.setInt(1, oldConfigID);
 			result = pstate.executeQuery(); // Execute query
 			/** Extract tuple data */
 			result.next();
@@ -97,6 +97,47 @@ public class Configurations {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Return false as a default value
+	}
+
+	/**
+	 * Update a course
+	 * 
+	 * @param oldDepartment
+	 * @param oldNumber
+	 * @param newDepartment
+	 * @param newNumber
+	 * @param newTitle
+	 * @param newUnits
+	 * @param newCost
+	 * @return
+	 */
+	public static boolean update(int oldConfigID, int newConfigID, String term, int year, String days, String time,
+			String room, int seats) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (oldConfigID < 0 || newConfigID < 0 || term == null || year < 1900 || days == null || time == null
+				|| room == null || seats < 0)
+			return false;
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			// HashMap<String, String> course = search(oldConfigID); // Search for config to update
+			SQLMethods.mysqlConnect(); // Connect to DB
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Configurations SET configID = ?, term = ?, year = ?, days = ?, time = ?, room = ?, seats = ? WHERE configID = ?;");
+			pstate.setInt(1, newConfigID);
+			pstate.setString(2, term);
+			pstate.setInt(3, year);
+			pstate.setString(4, days);
+			pstate.setString(5, time);
+			pstate.setString(6, room);
+			pstate.setInt(7, seats);
+			pstate.setInt(8, oldConfigID);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
 	}
 
 	/* ############################################################ */

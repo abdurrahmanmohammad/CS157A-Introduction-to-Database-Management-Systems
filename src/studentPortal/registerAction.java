@@ -1,4 +1,4 @@
-package registers;
+package studentPortal;
 
 import java.io.IOException;
 import java.util.Random;
