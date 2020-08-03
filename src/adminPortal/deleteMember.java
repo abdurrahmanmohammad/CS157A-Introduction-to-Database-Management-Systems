@@ -13,7 +13,7 @@ import administrators.Administrators;
 import courses.Courses;
 import instructors.Instructors;
 import members.Members;
-import registers.Registers;
+import registers.studentRegisters;
 import students.Students;
 import teaches.Teaches;
 import transactions.Transactions;
@@ -55,7 +55,7 @@ public class deleteMember extends HttpServlet {
 		/** Delete all dependencies to this ID */
 		Administrators.delete(ID);
 		Students.delete(ID);
-		Registers.dropAll(ID);
+		studentRegisters.dropAll(ID);
 		Transactions.deleteAll(ID);
 		Instructors.delete(ID);
 		Teaches.dropAll(ID);

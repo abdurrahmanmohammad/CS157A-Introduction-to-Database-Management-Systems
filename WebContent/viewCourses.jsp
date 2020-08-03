@@ -1,5 +1,5 @@
-<%@ page import="teaches.Teaches,registers.Registers,java.util.ArrayList,java.util.HashMap" language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page import="teaches.Teaches,registers.studentRegisters,java.util.ArrayList,java.util.HashMap" language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>

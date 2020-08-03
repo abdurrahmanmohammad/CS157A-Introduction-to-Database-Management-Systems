@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /** Registers(studentID, department, number, configID) */
-public class Registers {
+public class studentRegisters {
 	private static ResultSet result;
 	private static PreparedStatement pstate;
 
@@ -17,7 +17,7 @@ public class Registers {
 	 * table Registers(studentID, department, number, configID) if course is open
 	 * and student has not already registered for this course. If seats are filled,
 	 * the course is waitlisted.
-	 * 
+	 *
 	 * @param studentID
 	 * @param department
 	 * @param number
@@ -58,7 +58,7 @@ public class Registers {
 	/**
 	 * Checks if a student is already registered for a certain course in
 	 * Registers(studentID, department, number, configID).
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	private static boolean isRegistered(String studentID, String department, String number, String configID)
@@ -79,7 +79,7 @@ public class Registers {
 	/**
 	 * Checks if a student is already registered for a certain course in
 	 * Registers(studentID, department, number, configID).
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	private static boolean isWaitlisted(String studentID, String department, String number, String configID)
@@ -132,7 +132,7 @@ public class Registers {
 	/**
 	 * Method that allows students to drop a course. Remove course from Waitlists
 	 * and Registers.
-	 * 
+	 *
 	 * @param department
 	 * @param number
 	 * @return true if successful, false if failure
@@ -170,9 +170,9 @@ public class Registers {
 	}
 
 	/**
-	 * If someone is on the Registers and drops, the next person on the waitlist
-	 * will get that course. Bump up the waitlist.
-	 * 
+	 * If someone is on the Registers and drops, the next person on the waitlist will
+	 * get that course. Bump up the waitlist.
+	 *
 	 * @param department
 	 * @param number
 	 * @param configID
@@ -206,7 +206,7 @@ public class Registers {
 	/**
 	 * Returns an ArrayList of all courses registered by a student identified by
 	 * studentID
-	 * 
+	 *
 	 * @param studentID
 	 * @return
 	 */
@@ -243,10 +243,43 @@ public class Registers {
 		return output; // Return false as a default value
 	}
 
+	public static ArrayList<HashMap<String, String>> viewTeachingCourses(String instructorID) {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		/** Check for invalid inputs. If any input is null, return false */
+		if (instructorID == null) return output; // Check if studentID is null, return empty list if so
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			/** Search and retrieve tuple */
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Registers JOIN Configurations Using (configID) WHERE instructorID = ? ORDER BY year DESC;");
+			pstate.setString(1, instructorID);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("term", result.getString("term"));
+				tuple.put("year", result.getString("year"));
+				tuple.put("department", result.getString("department"));
+				tuple.put("number", result.getString("number"));
+				tuple.put("days", result.getString("days"));
+				tuple.put("time", result.getString("time"));
+				tuple.put("room", result.getString("room"));
+				tuple.put("configID", result.getString("configID"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output; // Return false as a default value
+	}
+
 	/**
 	 * Returns an ArrayList of all courses waitlisted by a student identified by
 	 * studentID
-	 * 
+	 *
 	 * @param studentID
 	 * @return
 	 */
@@ -280,32 +313,6 @@ public class Registers {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output; // Return false as a default value
-	}
-
-	/**
-	 * Drop all courses (registered and waitlisted)
-	 * 
-	 * @param studentID
-	 * @return
-	 */
-	public static boolean dropAll(String studentID) {
-		/** Check for invalid inputs. If any input is null, return false */
-		if (studentID == null) return false;
-		SQLMethods.mysqlConnect(); // Connect to DB
-		try { // Attempt to delete
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Registers WHERE studentID = ?;");
-			pstate.setString(1, studentID);
-			pstate.executeUpdate(); // Execute query
-			pstate = SQLMethods.con.prepareStatement("DELETE FROM Waitlists WHERE studentID = ?;");
-			pstate.setString(1, studentID);
-			pstate.executeUpdate(); // Execute query
-			SQLMethods.closeConnection(); // Close connection
-			return true; // Successful insert
-		} catch (SQLException e) { // Print error and terminate program
-			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
-		}
-		return false; // Default value: false
-
 	}
 
 }

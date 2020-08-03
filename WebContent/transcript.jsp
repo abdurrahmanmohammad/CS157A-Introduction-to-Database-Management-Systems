@@ -1,4 +1,4 @@
-<%@ page import="registers.Registers,java.util.ArrayList,java.util.HashMap"
+<%@ page import="registers.studentRegisters,java.util.ArrayList,java.util.HashMap"
 	language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -60,7 +60,7 @@ body {
 			<td>Number</td>
 		</tr>
 	<%
-	ArrayList<HashMap<String, String>> courses = Registers.viewRegisteredCourses(studentID);
+	ArrayList<HashMap<String, String>> courses = studentRegisters.viewRegisteredCourses(studentID);
 	for (int i = 0; i < courses.size(); i++) {
 		HashMap<String, String> course = courses.get(i);
 	%>

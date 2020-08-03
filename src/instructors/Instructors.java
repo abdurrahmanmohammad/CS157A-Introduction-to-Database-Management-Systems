@@ -82,6 +82,26 @@ public class Instructors {
 		return false; // Default value: false
 	}
 
+	/**
+	 *
+	 * @param instructorID
+	 * @return
+	 */
+	public static String getStatus(String instructorID) {
+		if (instructorID == null) return "";
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to update
+			pstate = SQLMethods.con.prepareStatement("SELECT status FROM Instructors WHERE instructorID = ?;");
+			pstate.setString(1, instructorID); // instructorID of user
+			result = pstate.executeQuery();
+			SQLMethods.closeConnection(); // Close connection
+			return result.getString("status"); // status of instructor
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+
+	}
+
 	/* ############################################################ */
 	/* #################### Unused Methods Below #################### */
 	/* ############################################################ */

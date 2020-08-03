@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import registers.Registers;
+import registers.studentRegisters;
 
 /**
  * Servlet implementation class addCourse
@@ -43,7 +43,7 @@ public class addCourse extends HttpServlet {
 		String configID = request.getParameter("configID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		Registers.register(studentID, department, number, configID);
+		studentRegisters.register(studentID, department, number, configID);
 		RequestDispatcher req = request.getRequestDispatcher("add.jsp");
 		req.forward(request, response);
 	}

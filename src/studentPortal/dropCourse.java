@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import registers.Registers;
+import registers.studentRegisters;
 
 /**
  * Servlet implementation class dropCourse
@@ -44,7 +44,7 @@ public class dropCourse extends HttpServlet {
 		String configID = request.getParameter("configID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		Registers.drop(studentID, department, number, configID);
+		studentRegisters.drop(studentID, department, number, configID);
 		RequestDispatcher req = request.getRequestDispatcher("drop.jsp");
 		req.forward(request, response);
 	}
