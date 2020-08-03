@@ -1,3 +1,4 @@
+package studentPortal;
 
 
 import java.io.IOException;
@@ -9,19 +10,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import courses.Courses;
+import registers.Registers;
 
 /**
- * Servlet implementation class insertCourse
+ * Servlet implementation class dropCourse
  */
-@WebServlet("/insertCourse")
-public class insertCourse extends HttpServlet {
+@WebServlet("/dropCourse")
+public class dropCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public insertCourse() {
+    public dropCourse() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -38,13 +39,13 @@ public class insertCourse extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		/** Get inputs */
+		String studentID = request.getParameter("studentID");
+		String configID = request.getParameter("configID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		String title = request.getParameter("title");
-		int units = Integer.parseInt(request.getParameter("units"));
-		int cost = Integer.parseInt(request.getParameter("cost"));
-		Courses.insert(department, number, title, units, cost);
-		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp");
+		Registers.drop(studentID, department, number, configID);
+		RequestDispatcher req = request.getRequestDispatcher("drop.jsp");
 		req.forward(request, response);
 	}
 

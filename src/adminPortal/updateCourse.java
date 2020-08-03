@@ -1,3 +1,4 @@
+package adminPortal;
 
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class updateCourse extends HttpServlet {
 		String newTitle = request.getParameter("title");
 		int newUnits = Integer.parseInt(request.getParameter("units"));
 		int newCost = Integer.parseInt(request.getParameter("cost"));
-		Courses.updateCourse(oldDepartment, oldNumber, newDepartment, newNumber, newTitle, newUnits, newCost);
+		Courses.update(oldDepartment, oldNumber, newDepartment, newNumber, newTitle, newUnits, newCost);
 		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp");
 		req.forward(request, response);
 	}

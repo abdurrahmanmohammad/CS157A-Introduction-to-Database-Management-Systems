@@ -4,6 +4,7 @@ import SQL.SQLMethods;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /** Configurations(configID, term, year, days, time, room, seats) */
@@ -138,6 +139,36 @@ public class Configurations {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return false; // Default value: false
+	}
+	
+	/**
+	 * Method to retrieve all the configurations and their info in table Courses
+	 * 
+	 * @return all the configurations and their info in table cCnfigurations in an ArrayList
+	 */
+	public static ArrayList<HashMap<String, String>> getAll() {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Configurations ORDER BY year DESC;");
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("configID", Integer.toString(result.getInt("configID")));
+				tuple.put("term", result.getString("term"));
+				tuple.put("year", Integer.toString(result.getInt("year")));
+				tuple.put("days", result.getString("days"));
+				tuple.put("time", result.getString("time"));
+				tuple.put("room", result.getString("room"));
+				tuple.put("seats", Integer.toString(result.getInt("seats")));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			return output; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
 	}
 
 	/* ############################################################ */

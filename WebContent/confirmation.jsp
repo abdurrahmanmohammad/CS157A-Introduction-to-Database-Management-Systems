@@ -57,6 +57,6 @@ h2 {
 <h1>Registration successfully submitted!</h1>
 <h2>An administrator will be in touch with you shortly</h2>
 <h2>You will receive your username and password in your email</h2>
-<h2 href="index.jsp">Please return to the homepage</h2>
+<h2>Please return to the homepage</h2>
 </body>
 </html>

@@ -1,3 +1,4 @@
+package adminPortal;
 
 
 import java.io.IOException;
@@ -8,19 +9,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import registers.Registers;
+
+import courses.Courses;
 
 /**
- * Servlet implementation class addCourse
+ * Servlet implementation class insertCourse
  */
-@WebServlet("/addCourse")
-public class addCourse extends HttpServlet {
+@WebServlet("/insertCourse")
+public class insertCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public addCourse() {
+    public insertCourse() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,13 +39,13 @@ public class addCourse extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		/** Get inputs */
-		String studentID = request.getParameter("studentID");
-		String configID = request.getParameter("configID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		Registers.register(studentID, department, number, configID);
-		RequestDispatcher req = request.getRequestDispatcher("add.jsp");
+		String title = request.getParameter("title");
+		int units = Integer.parseInt(request.getParameter("units"));
+		int cost = Integer.parseInt(request.getParameter("cost"));
+		Courses.insert(department, number, title, units, cost);
+		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp");
 		req.forward(request, response);
 	}
 

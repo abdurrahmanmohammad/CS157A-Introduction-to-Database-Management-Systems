@@ -1,3 +1,4 @@
+package studentPortal;
 
 
 import java.io.IOException;
@@ -8,20 +9,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import courses.Courses;
+import registers.Registers;
 
 /**
- * Servlet implementation class deleteCourse
+ * Servlet implementation class addCourse
  */
-@WebServlet("/deleteCourse")
-public class deleteCourse extends HttpServlet {
+@WebServlet("/addCourse")
+public class addCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public deleteCourse() {
+    public addCourse() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -39,11 +39,13 @@ public class deleteCourse extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		/** Get inputs */
+		String studentID = request.getParameter("studentID");
+		String configID = request.getParameter("configID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		Courses.delete(department, number); // Remove course
-		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp");
-		req.forward(request, response); // Return to manageCourses.jsp
+		Registers.register(studentID, department, number, configID);
+		RequestDispatcher req = request.getRequestDispatcher("add.jsp");
+		req.forward(request, response);
 	}
 
 }
