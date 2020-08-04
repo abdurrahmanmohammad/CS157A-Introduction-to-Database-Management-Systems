@@ -61,7 +61,7 @@ public class updateMember extends HttpServlet {
 		String password = request.getParameter("password");
 
 		// If new ID conflicts with an existing member, return
-		if (Members.search(newID).size() == 0) {
+		if (newID.equals(oldID) || Members.search(newID).size() == 0) {
 			// Update references in all tables
 			Students.updateID(oldID, newID);
 			Instructors.updateID(oldID, newID);

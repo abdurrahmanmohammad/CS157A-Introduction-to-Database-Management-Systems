@@ -52,7 +52,7 @@ public class updateInstructor extends HttpServlet {
 		String status = request.getParameter("status");
 
 		// If new ID conflicts with an existing member, return
-		if (Members.search(newInstructorID).size() == 0) {
+		if (oldInstructorID.equals(newInstructorID) || Members.search(newInstructorID).size() == 0) {
 			// Update references of ID in all tables (if we want to change ID)
 			Members.updateID(oldInstructorID, newInstructorID); // Update reference in Members
 			Users.updateID(oldInstructorID, newInstructorID); // Update reference in Users

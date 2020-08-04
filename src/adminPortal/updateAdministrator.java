@@ -49,7 +49,7 @@ public class updateAdministrator extends HttpServlet {
 		String newAdminID = request.getParameter("newAdminID");
 		int clearance = Integer.parseInt(request.getParameter("clearance"));
 		// If new ID conflicts with an existing member, return
-		if (Members.search(newAdminID).size() == 0) {
+		if (oldAdminID.equals(newAdminID) || Members.search(newAdminID).size() == 0) {
 			// Update references
 			Members.updateID(oldAdminID, newAdminID);
 			Users.updateID(oldAdminID, newAdminID);

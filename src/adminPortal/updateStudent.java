@@ -53,7 +53,7 @@ public class updateStudent extends HttpServlet {
 		int unit_cap = Integer.parseInt(request.getParameter("unit_cap"));
 
 		// If new ID conflicts with an existing member, return
-		if (Members.search(newStudentID).size() == 0) {
+		if (newStudentID.equals(oldStudentID) || Members.search(newStudentID).size() == 0) {
 			// Update references of ID in all tables (if we want to change ID)
 			Members.updateID(oldStudentID, newStudentID); // Update reference in Members
 			Users.updateID(oldStudentID, newStudentID); // Update reference in Users
