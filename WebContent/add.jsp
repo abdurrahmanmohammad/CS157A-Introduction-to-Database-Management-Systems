@@ -87,7 +87,5 @@
 		}
 	%>
 	</table>
-
-
 </body>
 </html>
