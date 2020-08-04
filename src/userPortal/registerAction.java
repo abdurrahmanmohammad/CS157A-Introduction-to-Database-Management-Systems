@@ -68,7 +68,7 @@ public class registerAction extends HttpServlet {
 				/** Go to confirmation page */
 				RequestDispatcher req = request.getRequestDispatcher("confirmation.jsp"); // Go to confirmation page
 				req.forward(request, response);
-			} else if (type.equalsIgnoreCase("instructor")) { // Student
+			} else if (type.equalsIgnoreCase("student")) { // Student
 				Students.insert(ID, 0, 12); // Initial unit cap is 12
 				Members.insert(ID, firstname, lastname, phone, email, address); // Add member to DB
 				/** Go to confirmation page */
