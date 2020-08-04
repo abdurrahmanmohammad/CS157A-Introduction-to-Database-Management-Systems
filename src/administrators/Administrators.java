@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import SQL.SQLMethods;
+import members.Members;
+import users.Users;
 
 /** Administrators(adminID, clearance) */
-// Clearance 1 = manage accounts
-// Clearance 2 = manage courses
+// Clearance 1 = manage courses and configs
+// Clearance 2 = manage accounts
 // Clearance 3 = manage all
 
 /** Administrators(adminID, clearance) */
@@ -100,7 +102,7 @@ public class Administrators {
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
 			/** Search and retrieve tuple */
-			pstate = SQLMethods.con.prepareStatement("SELECT * FROM Administrators WHERE adminID = ?;");
+			pstate = SQLMethods.con.prepareStatement("SELECT clearance FROM Administrators WHERE adminID = ?;");
 			pstate.setString(1, adminID);
 			result = pstate.executeQuery(); // Execute query
 			/** Extract tuple data */
@@ -116,13 +118,16 @@ public class Administrators {
 	}
 
 	public static boolean update(String oldAdminID, String newAdminID, int clearance) {
+		Members.updateID(oldAdminID, newAdminID); // Update reference in Members
+		Users.updateID(oldAdminID, newAdminID); // Update reference in Users
 		SQLMethods.mysqlConnect(); // Connect to DB
-		try {
+		try { /** Update admin tuple */
 			pstate = SQLMethods.con
 					.prepareStatement("UPDATE Administrators SET adminID = ?, clearance = ? WHERE adminID = ?;");
 			pstate.setString(1, newAdminID);
 			pstate.setInt(2, clearance);
 			pstate.setString(3, oldAdminID);
+			pstate.executeUpdate();
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
@@ -141,8 +146,8 @@ public class Administrators {
 		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to search
-			pstate = SQLMethods.con
-					.prepareStatement("SELECT * FROM Administrators JOIN Members ON adminID = ID ORDER BY lastname ASC;");
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Administrators JOIN Members ON adminID = ID ORDER BY lastname ASC;");
 			result = pstate.executeQuery(); // Execute query
 			while (result.next()) {
 				HashMap<String, String> tuple = new HashMap<String, String>();
@@ -158,6 +163,21 @@ public class Administrators {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return output;
+	}
+
+	public static boolean updateID(String oldAdminID, String newAdminID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Administrators SET adminID = ? WHERE adminID = ?;");
+			pstate.setString(1, newAdminID);
+			pstate.setString(2, oldAdminID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
 	}
 
 	/* ############################################################ */

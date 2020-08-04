@@ -7,6 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import SQL.SQLMethods;
+import administrators.Administrators;
+import instructors.Instructors;
+import registers.Registers;
+import students.Students;
+import teaches.Teaches;
+import transactions.Transactions;
+import users.Users;
 
 /** Members(ID, firstname, lastname, phone, email, address) */
 public class Members {
@@ -110,15 +117,16 @@ public class Members {
 			result = pstate.executeQuery(); // Execute query
 			/** Extract member data */
 			// Members(ID, firstname, lastname, phone, email, address)
-			result.next();
-			output.put("ID", result.getString("ID"));
-			output.put("firstname", result.getString("firstname"));
-			output.put("lastname", result.getString("lastname"));
-			output.put("phone", result.getString("phone"));
-			output.put("email", result.getString("email"));
-			output.put("address", result.getString("address"));
-			output.put("username", result.getString("username"));
-			output.put("password", result.getString("password"));
+			while (result.next()) {
+				output.put("ID", result.getString("ID"));
+				output.put("firstname", result.getString("firstname"));
+				output.put("lastname", result.getString("lastname"));
+				output.put("phone", result.getString("phone"));
+				output.put("email", result.getString("email"));
+				output.put("address", result.getString("address"));
+				output.put("username", result.getString("username"));
+				output.put("password", result.getString("password"));
+			}
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Success
@@ -132,6 +140,7 @@ public class Members {
 			String email, String address) {
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
+			/** Update tuple in Members */
 			pstate = SQLMethods.con.prepareStatement(
 					"UPDATE Members SET ID = ?, firstname = ?, lastname = ?, phone = ?, email = ?, address = ? WHERE ID = ?;");
 			pstate.setString(1, newID);
@@ -144,6 +153,21 @@ public class Members {
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateID(String oldID, String newID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Members SET ID = ? WHERE ID = ?;");
+			pstate.setString(1, newID);
+			pstate.setString(2, oldID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}

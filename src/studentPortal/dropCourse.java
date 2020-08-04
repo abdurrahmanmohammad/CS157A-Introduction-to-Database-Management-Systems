@@ -1,6 +1,5 @@
 package studentPortal;
 
-
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -18,34 +17,38 @@ import registers.Registers;
 @WebServlet("/dropCourse")
 public class dropCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public dropCourse() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public dropCourse() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		/** Get inputs */
 		String studentID = request.getParameter("studentID");
-		String configID = request.getParameter("configID");
+		int configID = Integer.parseInt(request.getParameter("configID"));
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
 		Registers.drop(studentID, department, number, configID);
-		RequestDispatcher req = request.getRequestDispatcher("drop.jsp");
+		RequestDispatcher req = request.getRequestDispatcher("drop.jsp?studentID=" + studentID);
 		req.forward(request, response);
 	}
 

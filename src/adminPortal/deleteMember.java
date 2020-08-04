@@ -25,28 +25,33 @@ import users.Users;
 @WebServlet("/deleteMember")
 public class deleteMember extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public deleteMember() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public deleteMember() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		/** Get inputs */
+		String adminID = request.getParameter("adminID");
 		String ID = request.getParameter("ID");
 		String number = request.getParameter("number");
 		/** Delete Member and User */
@@ -59,10 +64,10 @@ public class deleteMember extends HttpServlet {
 		Transactions.deleteAll(ID);
 		Instructors.delete(ID);
 		Teaches.dropAll(ID);
-		
+
 		/** Return back */
-		RequestDispatcher req = request.getRequestDispatcher("manageMembers.jsp");
-		req.forward(request, response); 
+		RequestDispatcher req = request.getRequestDispatcher("manageMembers.jsp?adminID=" + adminID);
+		req.forward(request, response);
 	}
 
 }

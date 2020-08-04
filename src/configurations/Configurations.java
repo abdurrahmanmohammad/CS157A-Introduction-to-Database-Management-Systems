@@ -82,15 +82,16 @@ public class Configurations {
 			pstate.setInt(1, oldConfigID);
 			result = pstate.executeQuery(); // Execute query
 			/** Extract tuple data */
-			result.next();
-			// String term, int year, String days, String time, String room, int seats
-			output.put("configID", Integer.toString(result.getInt("configID")));
-			output.put("term", result.getString("term"));
-			output.put("year", Integer.toString(result.getInt("year")));
-			output.put("days", result.getString("days"));
-			output.put("time", result.getString("time"));
-			output.put("room", result.getString("room"));
-			output.put("seats", Integer.toString(result.getInt("seats")));
+			while (result.next()) {
+				// String term, int year, String days, String time, String room, int seats
+				output.put("configID", Integer.toString(result.getInt("configID")));
+				output.put("term", result.getString("term"));
+				output.put("year", Integer.toString(result.getInt("year")));
+				output.put("days", result.getString("days"));
+				output.put("time", result.getString("time"));
+				output.put("room", result.getString("room"));
+				output.put("seats", Integer.toString(result.getInt("seats")));
+			}
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Return output
@@ -112,26 +113,25 @@ public class Configurations {
 	 * @param newCost
 	 * @return
 	 */
-	public static boolean update(int oldConfigID, int newConfigID, String term, int year, String days, String time,
-			String room, int seats) {
+	public static boolean update(int configID, String term, int year, String days, String time, String room,
+			int seats) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (oldConfigID < 0 || newConfigID < 0 || term == null || year < 1900 || days == null || time == null
-				|| room == null || seats < 0)
+		if (configID < 0 || term == null || year < 1900 || days == null || time == null || room == null || seats < 0)
 			return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			// HashMap<String, String> course = search(oldConfigID); // Search for config to update
+			// HashMap<String, String> course = search(oldConfigID); // Search for config to
+			// update
 			SQLMethods.mysqlConnect(); // Connect to DB
 			pstate = SQLMethods.con.prepareStatement(
-					"UPDATE Configurations SET configID = ?, term = ?, year = ?, days = ?, time = ?, room = ?, seats = ? WHERE configID = ?;");
-			pstate.setInt(1, newConfigID);
-			pstate.setString(2, term);
-			pstate.setInt(3, year);
-			pstate.setString(4, days);
-			pstate.setString(5, time);
-			pstate.setString(6, room);
-			pstate.setInt(7, seats);
-			pstate.setInt(8, oldConfigID);
+					"UPDATE Configurations SET term = ?, year = ?, days = ?, time = ?, room = ?, seats = ? WHERE configID = ?;");
+			pstate.setString(1, term);
+			pstate.setInt(2, year);
+			pstate.setString(3, days);
+			pstate.setString(4, time);
+			pstate.setString(5, room);
+			pstate.setInt(6, seats);
+			pstate.setInt(7, configID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
@@ -140,11 +140,13 @@ public class Configurations {
 		}
 		return false; // Default value: false
 	}
-	
+
 	/**
-	 * Method to retrieve all the configurations and their info in table Configurations
+	 * Method to retrieve all the configurations and their info in table
+	 * Configurations
 	 * 
-	 * @return all the configurations and their info in table Configurations in an ArrayList
+	 * @return all the configurations and their info in table Configurations in an
+	 *         ArrayList
 	 */
 	public static ArrayList<HashMap<String, String>> getAll() {
 		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();

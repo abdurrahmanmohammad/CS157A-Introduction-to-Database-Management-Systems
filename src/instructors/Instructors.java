@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import SQL.SQLMethods;
+import members.Members;
+import teaches.Teaches;
+import users.Users;
 
 /** Instructors(instructorID, status) */
 public class Instructors {
@@ -114,8 +117,9 @@ public class Instructors {
 	public static boolean update(String oldInstructorID, String newInstructorID, String status) {
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			pstate = SQLMethods.con.prepareStatement(
-					"UPDATE Instructors SET instructorID = ?, status = ? WHERE instructorID = ?;");
+			/** Update instructor tuple */
+			pstate = SQLMethods.con
+					.prepareStatement("UPDATE Instructors SET instructorID = ?, status = ? WHERE instructorID = ?;");
 			pstate.setString(1, newInstructorID);
 			pstate.setString(2, status);
 			pstate.setString(3, oldInstructorID);
@@ -126,6 +130,39 @@ public class Instructors {
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
 		return false; // Default value: false
+	}
+
+	public static boolean updateID(String oldInstructorID, String newInstructorID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Instructors SET instructorID = ? WHERE instructorID = ?;");
+			pstate.setString(1, newInstructorID);
+			pstate.setString(2, oldInstructorID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static String getStatus(String instructorID) {
+		String status = "";
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to search
+			pstate = SQLMethods.con.prepareStatement("SELECT status FROM Instructors WHERE instructorID = ?;");
+			pstate.setString(1, instructorID);
+			result = pstate.executeQuery(); // Execute query
+			while (result.next()) {
+				status = result.getString(1);
+			}
+			result.close(); // Close result
+			return status; // Successful search
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return status;
 	}
 
 	/* ############################################################ */

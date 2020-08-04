@@ -1,23 +1,28 @@
-package adminPortal;
+package instructorPortal;
+
 
 import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import teaches.Teaches;
+
 /**
- * Servlet implementation class insertUser
+ * Servlet implementation class unteachCourse
  */
-@WebServlet("/insertUser")
-public class insertUser extends HttpServlet {
+@WebServlet("/unteachCourse")
+public class unteachCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public insertUser() {
+    public unteachCourse() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,8 +39,13 @@ public class insertUser extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		String instructorID = request.getParameter("instructorID");
+		String department = request.getParameter("department");
+		String number = request.getParameter("number");
+		int configID = Integer.parseInt(request.getParameter("configID"));
+		Teaches.delete(instructorID, department, number, configID);
+		RequestDispatcher req = request.getRequestDispatcher("roster.jsp?instructorID=" + instructorID);
+		req.forward(request, response);
 	}
 
 }

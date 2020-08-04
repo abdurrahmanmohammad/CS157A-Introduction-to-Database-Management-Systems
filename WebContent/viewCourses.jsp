@@ -18,7 +18,7 @@
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="index.jsp">Logout</a>
 	</div>
-	<h1>Offered Courses</h1>
+	<h1 style="text-align:center;">Offered Courses</h1>
 	<table class="content-table">
 		<tr>
 			<td>Term</td>
@@ -36,7 +36,6 @@
 	for (int i = 0; i < courses.size(); i++) {
 		HashMap<String, String> course = courses.get(i);
 	%>
-		 
 			<tr>
 				<td><%=course.get("term")%></td>
 				<td><%=course.get("year")%></td>

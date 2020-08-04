@@ -1,25 +1,42 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page
+	import="users.Users,instructors.Instructors,members.Members,java.util.HashMap"
+	language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Instructor Portal</title>
-<link href="portal.css" rel="stylesheet" type="text/css"/>
+<link href="portal.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-	<h1>Instructor Portal</h1>
+	<%
+		String username = request.getParameter("username");
+	String instructorID = request.getParameter("instructorID");
+	if (username == null) username = Users.search(instructorID).get("username");
+	if (instructorID == null) instructorID = Users.getID(username);
+	HashMap<String, String> admin = Members.search(instructorID);
+	String status = Instructors.getStatus(instructorID);
+	%>
+	<div class="topnav">
+		<a class="active"
+			href=<%="InstructorPortal.jsp?instructorID=" + instructorID%>>Instructor
+			Portal</a>
+		<% if (status.equalsIgnoreCase("Active")) { %>
+		<a href=<%="roster.jsp?instructorID=" + instructorID%>>Manage Courses</a> 
+		<a href=<%="teachCourse.jsp?instructorID=" + instructorID%>>Teach Course</a> 
+		<%
+			}
+		%>
+		<a href="index.jsp">Logout</a>
+	</div>
+	<h1 style="text-align: center;">Instructor Portal</h1>
 	<table class="content-table">
 		<tr>
 			<td>
-				<%String username = request.getParameter("username");%> 
-				<a>Welcome Instructor <%out.println(username);%></a>
+				<h2>Welcome Administrator <%out.println(admin.get("firstname") + " " + admin.get("lastname"));out.println("(" + instructorID + ")");%>
+				</h2>
 			</td>
-		</tr>
-		<tr></tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<td><a href="login.jsp"><b>Logout</b></a></td>
 		</tr>
 	</table>
 </body>

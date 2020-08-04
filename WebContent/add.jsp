@@ -10,7 +10,7 @@
 <link href="portal.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<% String studentID = request.getParameter("studentID"); // get ID from previous page %>
+<% String studentID = request.getParameter("studentID"); %>
 	<div class="topnav">
 		<a class="active" href=<%="studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
 		<a href=<%="add.jsp?studentID="+studentID%>>Add Courses</a>
@@ -20,7 +20,7 @@
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="index.jsp">Logout</a>
 	</div>
-	<h1>Registered Courses</h1>
+	<h1 style="text-align:center;">Registered Courses</h1>
 	<table class="content-table">
 		<tr>
 			<td>Term</td>
@@ -46,7 +46,7 @@
 		}
 	%>
 	</table>
-	<h1>Add Courses</h1>
+	<h1 style="text-align:center;">Add Courses</h1>
 	<table class="content-table">
 		<tr>
 			<td>Term</td>

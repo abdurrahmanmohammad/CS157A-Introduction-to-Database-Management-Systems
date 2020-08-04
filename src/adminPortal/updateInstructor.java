@@ -9,7 +9,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import courses.Courses;
 import instructors.Instructors;
+import members.Members;
+import teaches.Teaches;
+import users.Users;
 
 /**
  * Servlet implementation class updateInstructor
@@ -42,11 +46,21 @@ public class updateInstructor extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String adminID = request.getParameter("adminID");
 		String oldInstructorID = request.getParameter("oldInstructorID");
 		String newInstructorID = request.getParameter("newInstructorID");
 		String status = request.getParameter("status");
-		Instructors.update(oldInstructorID, newInstructorID, status);
-		RequestDispatcher req = request.getRequestDispatcher("manageInstructors.jsp");
+
+		// If new ID conflicts with an existing member, return
+		if (Members.search(newInstructorID).size() == 0) {
+			// Update references of ID in all tables (if we want to change ID)
+			Members.updateID(oldInstructorID, newInstructorID); // Update reference in Members
+			Users.updateID(oldInstructorID, newInstructorID); // Update reference in Users
+			Teaches.updateID(oldInstructorID, newInstructorID); // Update reference in Teaches
+			// Update instructor
+			Instructors.update(oldInstructorID, newInstructorID, status);
+		}
+		RequestDispatcher req = request.getRequestDispatcher("manageInstructors.jsp?adminID=" + adminID);
 		req.forward(request, response);
 	}
 

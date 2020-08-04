@@ -85,12 +85,13 @@ public class Courses {
 			pstate.setString(2, number);
 			result = pstate.executeQuery(); // Execute query
 			/** Extract tuple data */
-			result.next();
-			output.put("department", result.getString("department"));
-			output.put("number", result.getString("number"));
-			output.put("title", result.getString("title"));
-			output.put("units", Integer.toString(result.getInt("units")));
-			output.put("cost", Integer.toString(result.getInt("cost")));
+			while(result.next()) {
+				output.put("department", result.getString("department"));
+				output.put("number", result.getString("number"));
+				output.put("title", result.getString("title"));
+				output.put("units", Integer.toString(result.getInt("units")));
+				output.put("cost", Integer.toString(result.getInt("cost")));
+			}
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Return output

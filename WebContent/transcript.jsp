@@ -19,7 +19,7 @@
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="index.jsp">Logout</a>
 	</div>
-	<h1>Transcript</h1>
+	<h1 style="text-align:center;">Transcript</h1>
 	<table class="content-table">
 		<tr>
 			<td>Term</td>

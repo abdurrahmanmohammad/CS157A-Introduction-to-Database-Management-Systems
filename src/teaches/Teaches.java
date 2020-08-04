@@ -21,19 +21,19 @@ public class Teaches {
 	 * @param configID
 	 * @return true if successful insert, else false
 	 */
-	public static boolean insert(String instructorID, String department, String number, String configID) {
+	public static boolean insert(String instructorID, String department, String number, int configID) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (instructorID == null || department == null || number == null || configID == null) return false;
+		if (instructorID == null || department == null || number == null || configID < 0) return false;
 		/** Insert tuple */
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
 			// Check if course is already being taught
 			if (isTeaching(department, number, configID)) return false;
 			pstate = SQLMethods.con.prepareStatement("INSERT INTO Teaches VALUES (?, ?, ?, ?);");
-			pstate.setString(3, instructorID);
+			pstate.setString(1, instructorID);
 			pstate.setString(2, department);
 			pstate.setString(3, number);
-			pstate.setString(4, configID);
+			pstate.setInt(4, configID);
 			pstate.executeUpdate(); // Execute query
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Successful insert
@@ -43,21 +43,19 @@ public class Teaches {
 		return false; // Default value: false
 	}
 
-	private static boolean isTeaching(String department, String number, String configID)
-			throws SQLException {
+	private static boolean isTeaching(String department, String number, int configID) throws SQLException {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (department == null || number == null || configID == null) return false;
-		pstate = SQLMethods.con.prepareStatement(
-				"SELECT COUNT(*) FROM Teaches WHERE department = ? AND number = ? AND configID = ?;");
+		if (department == null || number == null || configID < 0) return false;
+		pstate = SQLMethods.con
+				.prepareStatement("SELECT COUNT(*) FROM Teaches WHERE department = ? AND number = ? AND configID = ?;");
 		pstate.setString(1, department);
 		pstate.setString(2, number);
-		pstate.setString(3, configID);
+		pstate.setInt(3, configID);
 		result = pstate.executeQuery();
 		result.next();
 		int rowcount = result.getInt(1); // Get row count
 		result.close(); // Close result
-		SQLMethods.closeConnection(); // Close connection to DB
-		return (rowcount == 1); // If rowcount == 1, instructor is teaching this course
+		return (rowcount != 0); // If rowcount == 0, course is not taught
 	}
 
 	/**
@@ -69,31 +67,34 @@ public class Teaches {
 	 * @param configID
 	 * @return true if successful delete, else false
 	 */
-	public static boolean delete(String instructorID, String department, String number, String configID) {
+	public static boolean delete(String instructorID, String department, String number, int configID) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (instructorID == null || department == null || number == null || configID == null) return false;
+		if (instructorID == null || department == null || number == null || configID < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
 			pstate = SQLMethods.con.prepareStatement(
 					"DELETE FROM Teaches WHERE instructorID = ? AND department = ? AND number = ? AND configID = ?;");
 			pstate.setString(1, instructorID);
-			pstate.setString(3, department);
-			pstate.setString(2, number);
-			pstate.setString(3, configID);
-			// When course is dropped (not taught), remove registered and waitlisted
-			// students
-			pstate = SQLMethods.con.prepareStatement(
-					"DELETE FROM Registers WHERE department = ? AND number = ? AND configID = ?;");
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setInt(4, configID);
+			int rowcount = pstate.executeUpdate(); // Execute query
+
+			// When course is dropped, remove registered and waitlisted students
+			pstate = SQLMethods.con
+					.prepareStatement("DELETE FROM Registers WHERE department = ? AND number = ? AND configID = ?;");
 			pstate.setString(1, department);
 			pstate.setString(2, number);
-			pstate.setString(3, configID);
-			pstate.executeUpdate(); // Execute query
-			pstate = SQLMethods.con.prepareStatement(
-					"DELETE FROM Waitlists WHERE department = ? AND number = ? AND configID = ?;");
+			pstate.setInt(3, configID);
+			rowcount += pstate.executeUpdate(); // Execute query
+
+			pstate = SQLMethods.con
+					.prepareStatement("DELETE FROM Waitlists WHERE department = ? AND number = ? AND configID = ?;");
 			pstate.setString(1, department);
 			pstate.setString(2, number);
-			pstate.setString(3, configID);
-			pstate.executeUpdate(); // Execute query
+			pstate.setInt(3, configID);
+			rowcount += pstate.executeUpdate(); // Execute query
+
 			SQLMethods.closeConnection(); // Close connection
 			return true; // Successful insert
 		} catch (SQLException e) { // Print error and terminate program
@@ -172,9 +173,11 @@ public class Teaches {
 				tuple.put("number", result.getString("number"));
 				tuple.put("term", result.getString("term"));
 				tuple.put("year", result.getString("year"));
-				tuple.put("days", result.getString("time"));
+				tuple.put("days", result.getString("days"));
+				tuple.put("time", result.getString("time"));
 				tuple.put("room", result.getString("room"));
 				tuple.put("seats", result.getString("seats"));
+				tuple.put("configID", Integer.toString(result.getInt("configID")));
 				output.add(tuple);
 			}
 			result.close(); // Close result
@@ -186,9 +189,54 @@ public class Teaches {
 		return output; // Return false as a default value
 	}
 
-	/* ############################################################ */
-	/* #################### Unused Methods Below #################### */
-	/* ############################################################ */
+	public static boolean updateID(String oldInstructorID, String newInstructorID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Teaches SET instructorID = ? WHERE instructorID = ?;");
+			pstate.setString(1, newInstructorID);
+			pstate.setString(2, oldInstructorID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateConfigID(int oldConfigID, int newConfigID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement("UPDATE Teaches SET configID = ? WHERE configID = ?;");
+			pstate.setInt(1, newConfigID);
+			pstate.setInt(2, oldConfigID);
+			int rowcount = pstate.executeUpdate();
+
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateCourse(String oldDept, String oldNum, String newDept, String newNum) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Teaches SET department = ?, number = ? WHERE department = ? AND number = ?;");
+			pstate.setString(1, newDept);
+			pstate.setString(2, newNum);
+			pstate.setString(3, oldDept);
+			pstate.setString(4, oldNum);
+			int rowcount = pstate.executeUpdate();
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
 
 	/**
 	 * Get all tuples as HashMap in the table Teaches in an ArrayList

@@ -1,6 +1,5 @@
 package adminPortal;
 
-
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -18,34 +17,39 @@ import courses.Courses;
 @WebServlet("/deleteCourse")
 public class deleteCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public deleteCourse() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public deleteCourse() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		/** Get inputs */
+		String adminID = request.getParameter("adminID");
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
 		/** Delete Course */
 		Courses.delete(department, number); // Remove course
 		/** Return to manageCourses.jsp */
-		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp");
+		RequestDispatcher req = request.getRequestDispatcher("manageCourses.jsp?adminID=" + adminID);
 		req.forward(request, response); // Return to manageCourses.jsp
 	}
 

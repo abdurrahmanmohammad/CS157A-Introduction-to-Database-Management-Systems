@@ -24,28 +24,26 @@ public class Registers {
 	 * @param configID
 	 * @return true if successful, false if failure
 	 */
-	public static boolean register(String studentID, String department, String number, String configID) {
+	public static boolean register(String studentID, String department, String number, int configID) {
 		/** Check for invalid inputs. If any input is null, return false */
-		if (studentID == null || department == null || number == null || configID == null) return false;
+		if (studentID == null || department == null || number == null || configID < 0) return false;
+		/** Check if student already registered for this course */
+		if (isRegistered(studentID, department, number, configID)) return false;
+		/** Check if student already waitlisted this course */
+		if (isWaitlisted(studentID, department, number, configID)) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to insert
-			/** Check if student already registered for this course */
-			// Return false if already registered
-			if (isRegistered(studentID, department, number, configID)
-					|| isWaitlisted(studentID, department, number, configID))
-				return false;
 			/** Check if seats are open */
-			if (isOpen(department, number, configID)) { // If course is open, register for course
-				pstate = SQLMethods.con.prepareStatement(
-						"INSERT INTO Registers(studentID, department, number, configID) VALUES(?, ?, ?, ?);");
-			} else { // If course is not open, waitlist course
-				pstate = SQLMethods.con.prepareStatement(
-						"INSERT INTO Wailtlists(studentID, department, number, configID) VALUES(?, ?, ?, ?);");
-			}
+			// If course is open, register for course
+			// If course is not open, waitlist course
+			if (isOpen(department, number, configID))
+				pstate = SQLMethods.con.prepareStatement("INSERT INTO Registers VALUES (?, ?, ?, ?);");
+			else
+				pstate = SQLMethods.con.prepareStatement("INSERT INTO Wailtlists VALUES (?, ?, ?, ?);");
 			pstate.setString(1, studentID);
 			pstate.setString(2, department);
 			pstate.setString(3, number);
-			pstate.setString(4, configID);
+			pstate.setInt(4, configID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
@@ -61,19 +59,24 @@ public class Registers {
 	 * 
 	 * @throws SQLException
 	 */
-	private static boolean isRegistered(String studentID, String department, String number, String configID)
-			throws SQLException {
-		pstate = SQLMethods.con.prepareStatement(
-				"SELECT Count(*) FROM Registers WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
-		pstate.setString(1, studentID);
-		pstate.setString(2, department);
-		pstate.setString(3, number);
-		pstate.setString(4, configID);
-		result = pstate.executeQuery();
-		result.next();
-		int rowcount = result.getInt(1);
-		result.close(); // Close result
-		return (rowcount == 1); // True if already registered, false if not registered
+	private static boolean isRegistered(String studentID, String department, String number, int configID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT Count(*) FROM Registers WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
+			pstate.setString(1, studentID);
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setInt(4, configID);
+			result = pstate.executeQuery();
+			result.next();
+			int rowcount = result.getInt(1);
+			result.close(); // Close result
+			return (rowcount == 1); // True if already registered, false if not registered
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
 	}
 
 	/**
@@ -82,32 +85,37 @@ public class Registers {
 	 * 
 	 * @throws SQLException
 	 */
-	private static boolean isWaitlisted(String studentID, String department, String number, String configID)
-			throws SQLException {
-		pstate = SQLMethods.con.prepareStatement(
-				"SELECT Count(*) FROM Waitlists WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
-		pstate.setString(1, studentID);
-		pstate.setString(2, department);
-		pstate.setString(3, number);
-		pstate.setString(4, configID);
-		result = pstate.executeQuery();
-		result.next();
-		int rowcount = result.getInt(1);
-		result.close(); // Close result
-		return (rowcount == 1); // True if already registered, false if not registered
+	private static boolean isWaitlisted(String studentID, String department, String number, int configID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT Count(*) FROM Waitlists WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
+			pstate.setString(1, studentID);
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setInt(4, configID);
+			result = pstate.executeQuery();
+			result.next();
+			int rowcount = result.getInt(1);
+			result.close(); // Close result
+			return (rowcount == 1); // True if already registered, false if not registered
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
 	}
 
 	/**
 	 * Checks if a course is open by counting the number of registered students and
 	 * comparing them with the seats available for the course's configuration.
 	 */
-	private static boolean isOpen(String department, String number, String configID) throws SQLException {
+	private static boolean isOpen(String department, String number, int configID) throws SQLException {
 		/** Get number of registrants for a particular course */
 		pstate = SQLMethods.con.prepareStatement(
 				"SELECT Count(*) FROM Registers WHERE department = ? AND number = ? AND configID = ?;");
 		pstate.setString(1, department);
 		pstate.setString(2, number);
-		pstate.setString(3, configID);
+		pstate.setInt(3, configID);
 		result = pstate.executeQuery();
 		result.next();
 		int rowcount = result.getInt(1);
@@ -119,9 +127,9 @@ public class Registers {
 	}
 
 	/** Gets the seats for a particular configuration */
-	public static int getSeats(String configID) throws SQLException {
+	public static int getSeats(int configID) throws SQLException {
 		pstate = SQLMethods.con.prepareStatement("SELECT seats FROM Configurations WHERE configID = ?;");
-		pstate.setString(1, configID);
+		pstate.setInt(1, configID);
 		result = pstate.executeQuery(); // Execute query
 		result.next();
 		int rowcount = result.getInt(1);
@@ -137,8 +145,8 @@ public class Registers {
 	 * @param number
 	 * @return true if successful, false if failure
 	 */
-	public static boolean drop(String studentID, String department, String number, String configID) {
-		if (studentID == null || department == null | number == null || configID == null) return false;
+	public static boolean drop(String studentID, String department, String number, int configID) {
+		if (studentID == null || department == null | number == null || configID < 0) return false;
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try { // Attempt to delete
 			/**
@@ -146,17 +154,23 @@ public class Registers {
 			 * have another student waiting on waitlist, so we move waiting student to
 			 * Registers and delete old student.
 			 */
-			if (isWaitlisted(studentID, studentID, number, configID)) { // If student is on waitlist
+			int value = 0;
+			if (isWaitlisted(studentID, department, number, configID)) { // If student is on waitlist
 				pstate = SQLMethods.con.prepareStatement(
 						"DELETE FROM Waitlists WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
+				pstate.setString(1, studentID);
+				pstate.setString(2, department);
+				pstate.setString(3, number);
+				pstate.setInt(4, configID);
+				value = pstate.executeUpdate();
 			} else {
 				pstate = SQLMethods.con.prepareStatement(
 						"DELETE FROM Registers WHERE studentID = ? AND department = ? AND number = ? AND configID = ?;");
 				pstate.setString(1, studentID);
 				pstate.setString(2, department);
 				pstate.setString(3, number);
-				pstate.setString(4, configID);
-				int value = pstate.executeUpdate();
+				pstate.setInt(4, configID);
+				value = pstate.executeUpdate();
 
 				/** Adjust the watlist if needed */
 				adjustWaitlist(studentID, studentID, number, configID);
@@ -178,14 +192,14 @@ public class Registers {
 	 * @param configID
 	 * @throws SQLException
 	 */
-	private static void adjustWaitlist(String oldStudentID, String department, String number, String configID)
+	private static void adjustWaitlist(String oldStudentID, String department, String number, int configID)
 			throws SQLException {
 		/** Find waiting student on top of waitlist */
 		pstate = SQLMethods.con.prepareStatement(
 				"SELECT studentID FROM Waitlists WHERE department = ? AND number = ? AND configID = ?;");
 		pstate.setString(1, department);
 		pstate.setString(2, number);
-		pstate.setString(3, configID);
+		pstate.setInt(3, configID);
 		result = pstate.executeQuery(); // Execute query
 		if (result.next() == false) return; // Return back if empty
 		String newStudentID = result.getString(1); // Get first studentID in list
@@ -199,7 +213,7 @@ public class Registers {
 		pstate.setString(1, newStudentID);
 		pstate.setString(2, department);
 		pstate.setString(3, number);
-		pstate.setString(4, configID);
+		pstate.setInt(4, configID);
 		return;
 	}
 
@@ -231,7 +245,7 @@ public class Registers {
 				tuple.put("days", result.getString("days"));
 				tuple.put("time", result.getString("time"));
 				tuple.put("room", result.getString("room"));
-				tuple.put("configID", result.getString("configID"));
+				tuple.put("configID", Integer.toString(result.getInt("configID")));
 				output.add(tuple);
 			}
 			result.close(); // Close result
@@ -295,12 +309,14 @@ public class Registers {
 		try { // Attempt to delete
 			pstate = SQLMethods.con.prepareStatement("DELETE FROM Registers WHERE studentID = ?;");
 			pstate.setString(1, studentID);
-			pstate.executeUpdate(); // Execute query
+			int rowcount = pstate.executeUpdate();
+
 			pstate = SQLMethods.con.prepareStatement("DELETE FROM Waitlists WHERE studentID = ?;");
 			pstate.setString(1, studentID);
-			pstate.executeUpdate(); // Execute query
+			rowcount += pstate.executeUpdate(); // Execute query
+
 			SQLMethods.closeConnection(); // Close connection
-			return true; // Successful insert
+			return (rowcount == 2);
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}
@@ -308,4 +324,151 @@ public class Registers {
 
 	}
 
+	public static boolean updateID(String oldStudentID, String newStudentID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Registers SET studentID = ? WHERE studentID = ?;");
+			pstate.setString(1, newStudentID);
+			pstate.setString(2, oldStudentID);
+			int rowcount = pstate.executeUpdate();
+
+			pstate = SQLMethods.con.prepareStatement("UPDATE Waitlists SET studentID = ? WHERE studentID = ?;");
+			pstate.setString(1, newStudentID);
+			pstate.setString(2, oldStudentID);
+			rowcount += pstate.executeUpdate();
+
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 2);
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateConfigID(int oldConfigID, int newConfigID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement("UPDATE Registers SET configID = ? WHERE configID = ?;");
+			pstate.setInt(1, newConfigID);
+			pstate.setInt(2, oldConfigID);
+			int rowcount = pstate.executeUpdate();
+
+			pstate = SQLMethods.con.prepareStatement("UPDATE Waitlists SET configID = ? WHERE configID = ?;");
+			pstate.setInt(1, newConfigID);
+			pstate.setInt(2, oldConfigID);
+			rowcount += pstate.executeUpdate();
+
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 2);
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateCourse(String oldDept, String oldNum, String newDept, String newNum) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Registers SET department = ?, number = ? WHERE department = ? AND number = ?;");
+			pstate.setString(1, newDept);
+			pstate.setString(2, newNum);
+			pstate.setString(3, oldDept);
+			pstate.setString(4, oldNum);
+			int rowcount = pstate.executeUpdate();
+
+			pstate = SQLMethods.con.prepareStatement(
+					"UPDATE Waitlists SET department = ?, number = ? WHERE department = ? AND number = ?;");
+			pstate.setString(1, newDept);
+			pstate.setString(2, newNum);
+			pstate.setString(3, oldDept);
+			pstate.setString(4, oldNum);
+			rowcount += pstate.executeUpdate();
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 2); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static ArrayList<HashMap<String, String>> getRegisteredStudents(String department, String number,
+			int configID) {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Registers JOIN Members ON studentID = ID WHERE department = ? AND number = ? AND configID = ?;");
+			pstate.setString(1, department);
+			pstate.setString(2, number);
+			pstate.setInt(3, configID);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("studentID", result.getString("studentID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
+	}
+
+	public static ArrayList<HashMap<String, String>> getWaitlistedStudents(String department, String number,
+			int configID) {
+		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			pstate = SQLMethods.con.prepareStatement(
+					"SELECT * FROM Waitlists JOIN Members ON studentID = ID WHERE department = ? AND number = ? AND configID = ?;");
+			pstate.setString(1, department);
+			pstate.setString(2, number);
+			pstate.setInt(3, configID);
+			result = pstate.executeQuery(); // Execute query
+			/** Extract tuple data */
+			while (result.next()) {
+				HashMap<String, String> tuple = new HashMap<String, String>();
+				tuple.put("studentID", result.getString("studentID"));
+				tuple.put("firstname", result.getString("firstname"));
+				tuple.put("lastname", result.getString("lastname"));
+				output.add(tuple);
+			}
+			result.close(); // Close result
+			SQLMethods.closeConnection(); // Close connection
+			return output; // Return output
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return output;
+	}
+
+	public static boolean overrideRegister(String studentID, String department, String number, int configID) {
+		/** Check for invalid inputs. If any input is null, return false */
+		if (studentID == null || department == null || number == null || configID < 0) return false;
+		/** Check if student already registered for this course */
+		if (isRegistered(studentID, department, number, configID)) return false;
+		drop(studentID, department, number, configID); // Drop student from waitlist if possible
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try { // Attempt to insert
+				// Ignore if seats are filled
+			pstate = SQLMethods.con.prepareStatement("INSERT INTO Registers VALUES (?, ?, ?, ?);");
+			pstate.setString(1, studentID);
+			pstate.setString(2, department);
+			pstate.setString(3, number);
+			pstate.setInt(4, configID);
+			int rowcount = pstate.executeUpdate(); // Number of rows affected
+			SQLMethods.closeConnection(); // Close connection
+			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
 }

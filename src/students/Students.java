@@ -1,6 +1,11 @@
 package students;
 
 import SQL.SQLMethods;
+import members.Members;
+import registers.Registers;
+import transactions.Transactions;
+import users.Users;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -65,7 +70,22 @@ public class Students {
 			pstate.setString(4, oldStudentID);
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
-			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateID(String oldStudentID, String newStudentID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Students SET studentID = ? WHERE studentID = ?;");
+			pstate.setString(1, newStudentID);
+			pstate.setString(2, oldStudentID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}

@@ -1,4 +1,4 @@
-<%@ page import="users.Users" language="java"
+<%@ page import="users.Users,members.Members,java.util.HashMap" language="java"
 	contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -9,9 +9,11 @@
 </head>
 <body>
 	<div class="topnav">
-		<%String username = request.getParameter("username");%>
-		<% String studentID = request.getParameter("studentID");%>
-		<%if(studentID == null)  studentID = Users.getID(username);%>	
+	<% 	String username = request.getParameter("username");
+		String studentID = request.getParameter("studentID");
+	 	if(username == null) username = Users.search(studentID).get("username");
+	 	if(studentID == null)  studentID = Users.getID(username);
+	 	HashMap<String, String> student = Members.search(studentID);%>	
 		<a class="active" href=<%="studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
 		<a href=<%="add.jsp?studentID="+studentID%>>Add Courses</a>
 		<a href=<%="drop.jsp?studentID="+studentID%>>Drop Courses</a>
@@ -20,20 +22,10 @@
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="index.jsp">Logout</a>
 	</div>
-	<h1>Student Portal</h1>
-	<h2>Welcome Student
-		<%out.println(username);out.println(studentID);%></h2>
-	<h1>Manage Courses</h1>
-	<form action="ManageStudentCourses" method="post">
-		<input type="submit" class="btn" value="View Enrolled Courses">
-		<input type="submit" class="btn" value="Search Courses">
-		<table class="content-table">
-			<tr></tr>
-			<tr>
-				<td></td>
-				<td></td>
-				<td><a href="login.jsp"><b>Logout</b></a></td>
-			</tr>
-		</table>
-	</form>
+	<h1 style="text-align:center;">Student Portal</h1>
+	<table class="content-table">
+		<tr>
+		<td><h2>Welcome Student <%out.println(student.get("firstname") + " " + student.get("lastname"));out.println("(" + studentID + ")");%></h2></td>
+		</tr>
+	</table>
 </body>

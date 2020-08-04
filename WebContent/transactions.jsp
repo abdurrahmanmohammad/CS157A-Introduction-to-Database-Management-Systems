@@ -10,9 +10,7 @@
 <link href="portal.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-	<%
-		String studentID = request.getParameter("studentID"); // get ID from previous page
-	%>
+	<% String studentID = request.getParameter("studentID");%>
 	<div class="topnav">
 		<a class="active" href=<%="studentPortal.jsp?studentID="+studentID%>>Student Portal</a> 
 		<a href=<%="add.jsp?studentID=" + studentID%>>Add Courses</a> 
@@ -25,16 +23,25 @@
 	<%
 		ArrayList<HashMap<String, String>> transactions = Transactions.viewTransactions(studentID);
 	%>
-	<h1>Make a Transaction:</h1>
+	<h1 style="text-align:center;">Make a Transaction:</h1>
 	<form action="transactionAction" method="post">
-		<label for="credit card">Credit Card:</label><br> <input
-			type="text" id="creditcard" name="creditcard"><br> <label
-			for="amount">Amount:</label><br> <input type="text" id="amount"
-			name="amount"><br> <input type="hidden" id="studentID"
-			name="studentID" value=<%=request.getParameter("studentID")%>>
-		<input type="submit" value="Submit">
+	<table class="content-table">
+		<tr>
+			<td>Credit Card</td>
+			<td><input type="text" id="creditcard" name="creditcard"> <td>
+		</tr>
+		<tr>
+			<td>Amount</td>
+			<td><input type="text" id="amount" name="amount"><td>
+		</tr>
+		<tr>
+			<td><input type="hidden" id="studentID" name="studentID" value=<%=studentID%>></td>
+			<td><input type="submit" value="Submit"><td>
+		</tr>
+	</table>
 	</form>
-
+	
+	<h1 style="text-align:center;">Transaction History</h1>
 	<table class="content-table">
 		<tr>
 			<td>Credit Card</td>

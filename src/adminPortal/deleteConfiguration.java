@@ -39,11 +39,12 @@ public class deleteConfiguration extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		/** Get inputs */
+		String adminID = request.getParameter("adminID");
 		String configID = request.getParameter("configID");
 		/** Delete configuration */
 		Configurations.delete(configID); // Remove configuration
 		/** Return to manageConfigurations.jsp */
-		RequestDispatcher req = request.getRequestDispatcher("manageConfigurations.jsp");
+		RequestDispatcher req = request.getRequestDispatcher("manageConfigurations.jsp?adminID=" + adminID);
 		req.forward(request, response); // Return to manageConfigurations.jsp
 	}
 

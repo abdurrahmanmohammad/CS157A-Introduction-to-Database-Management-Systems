@@ -6,6 +6,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import SQL.SQLMethods;
+import administrators.Administrators;
+import instructors.Instructors;
+import members.Members;
+import registers.Registers;
+import students.Students;
+import teaches.Teaches;
+import transactions.Transactions;
 
 // Users(ID, username, password)
 public class Users {
@@ -84,13 +91,18 @@ public class Users {
 		}
 		return 0; // Return 0 as a default value
 	}
-	
+
 	public static String mapType(int type) {
-		if(type == 0) return "None";
-		else if(type == 1) return "Administrator";
-		else if(type == 2) return "Instructor";
-		else if(type == 3) return "Student";
-		else return "DNE";
+		if (type == 0)
+			return "None";
+		else if (type == 1)
+			return "Administrator";
+		else if (type == 2)
+			return "Instructor";
+		else if (type == 3)
+			return "Student";
+		else
+			return "DNE";
 	}
 
 	/**
@@ -145,10 +157,11 @@ public class Users {
 			pstate.setString(1, ID); // ID of member
 			result = pstate.executeQuery(); // Execute query
 			/** Extract member data */
-			result.next();
-			output.put("ID", result.getString("ID"));
-			output.put("username", result.getString("username"));
-			output.put("password", result.getString("password"));
+			while(result.next()) {
+				output.put("ID", result.getString("ID"));
+				output.put("username", result.getString("username"));
+				output.put("password", result.getString("password"));
+			}
 			result.close(); // Close result
 			SQLMethods.closeConnection(); // Close connection
 			return output; // Success
@@ -180,9 +193,19 @@ public class Users {
 
 	public static boolean update(String oldID, String newID, String username, String password) {
 		/** Check for invalid inputs. If any input is null, return false */
+		// Update references in all tables
+		Members.updateID(oldID, newID);
+		Students.updateID(oldID, newID);
+		Instructors.updateID(oldID, newID);
+		Administrators.updateID(oldID, newID);
+		Registers.updateID(oldID, newID);
+		Transactions.updateID(oldID, newID);
+		Teaches.updateID(oldID, newID);
+		
 		SQLMethods.mysqlConnect(); // Connect to DB
 		try {
-			pstate = SQLMethods.con.prepareStatement("UPDATE Users SET ID = ?, username = ?, password = ? WHERE ID = ?;");
+			pstate = SQLMethods.con
+					.prepareStatement("UPDATE Users SET ID = ?, username = ?, password = ? WHERE ID = ?;");
 			pstate.setString(1, newID);
 			pstate.setString(2, username);
 			pstate.setString(3, password);
@@ -190,6 +213,21 @@ public class Users {
 			int rowcount = pstate.executeUpdate(); // Number of rows affected
 			SQLMethods.closeConnection(); // Close connection
 			return (rowcount == 1); // If rowcount == 1, row successfully inserted
+		} catch (SQLException e) { // Print error and terminate program
+			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
+		}
+		return false; // Default value: false
+	}
+
+	public static boolean updateID(String oldID, String newID) {
+		SQLMethods.mysqlConnect(); // Connect to DB
+		try {
+			/** Update ID */
+			pstate = SQLMethods.con.prepareStatement("UPDATE Users SET ID = ? WHERE ID = ?;");
+			pstate.setString(1, newID);
+			pstate.setString(2, oldID);
+			int rowcount = pstate.executeUpdate();
+			return (rowcount == 1); // If rowcount == 1, row successfully updated
 		} catch (SQLException e) { // Print error and terminate program
 			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
 		}

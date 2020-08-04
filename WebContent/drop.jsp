@@ -18,7 +18,7 @@
 		<a href=<%="transactions.jsp?studentID="+studentID%>>Transactions</a>
 		<a href="index.jsp">Logout</a>
 	</div>
-<h1>Registered Courses</h1>
+<h1 style="text-align:center;">Registered Courses</h1>
 	<table class="content-table">
 		<tr>
 			<td>Term</td>
@@ -26,6 +26,7 @@
 			<td>Department</td>
 			<td>Number</td>
 			<td>ConfigID</td>
+			<td></td>
 		</tr>
 	<%
 	ArrayList<HashMap<String, String>> regCourses = Registers.viewRegisteredCourses(studentID);
@@ -39,14 +40,14 @@
 			<td><%=regCourse.get("number")%></td>
 			<td><%=regCourse.get("configID")%></td>
 			<td>
-					<form action="dropCourse" method="post">
-					<input type="submit" value="Drop">
-					<input type="hidden" id="configID" name="configID" value=<%=regCourse.get("configID")%>>
-					<input type="hidden" id="studentID" name="studentID" value=<%=studentID%>>
-					<input type="hidden" id="department" name="department" value=<%=regCourse.get("department")%>>
-					<input type="hidden" id="number" name="number" value=<%=regCourse.get("number")%>>
-					</form>
-				</td>
+				<form action="dropCourse" method="post">
+				<input type="submit" value="Drop">
+				<input type="hidden" id="configID" name="configID" value=<%=regCourse.get("configID")%>>
+				<input type="hidden" id="studentID" name="studentID" value=<%=studentID%>>
+				<input type="hidden" id="department" name="department" value=<%=regCourse.get("department")%>>
+				<input type="hidden" id="number" name="number" value=<%=regCourse.get("number")%>>
+				</form>
+			</td>
 		</tr>
 
 	<%

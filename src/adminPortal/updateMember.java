@@ -9,7 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import administrators.Administrators;
+import instructors.Instructors;
 import members.Members;
+import registers.Registers;
+import students.Students;
+import teaches.Teaches;
+import transactions.Transactions;
 import users.Users;
 
 /**
@@ -43,6 +49,7 @@ public class updateMember extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String adminID = request.getParameter("adminID");
 		String oldID = request.getParameter("oldID");
 		String newID = request.getParameter("newID");
 		String firstname = request.getParameter("firstname");
@@ -52,11 +59,22 @@ public class updateMember extends HttpServlet {
 		String address = request.getParameter("address");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		// Update Members
-		Members.update(oldID, newID, firstname, lastname, phone, email, address);
-		// Update Users
-		Users.update(oldID, newID, username, password);
-		RequestDispatcher req = request.getRequestDispatcher("manageMembers.jsp");
+
+		// If new ID conflicts with an existing member, return
+		if (Members.search(newID).size() == 0) {
+			// Update references in all tables
+			Students.updateID(oldID, newID);
+			Instructors.updateID(oldID, newID);
+			Administrators.updateID(oldID, newID);
+			Registers.updateID(oldID, newID);
+			Transactions.updateID(oldID, newID);
+			Teaches.updateID(oldID, newID);
+			// Update Members
+			Members.update(oldID, newID, firstname, lastname, phone, email, address);
+			// Update User
+			Users.update(oldID, newID, username, password);
+		}
+		RequestDispatcher req = request.getRequestDispatcher("manageMembers.jsp?adminID=" + adminID);
 		req.forward(request, response);
 	}
 

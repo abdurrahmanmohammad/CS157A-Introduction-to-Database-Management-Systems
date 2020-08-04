@@ -1,4 +1,4 @@
-package studentPortal;
+package instructorPortal;
 
 import java.io.IOException;
 
@@ -8,19 +8,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import registers.Registers;
 
 /**
- * Servlet implementation class addCourse
+ * Servlet implementation class dropFromRoster
  */
-@WebServlet("/addCourse")
-public class addCourse extends HttpServlet {
+@WebServlet("/dropFromRoster")
+public class dropFromRoster extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public addCourse() {
+	public dropFromRoster() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -41,13 +42,14 @@ public class addCourse extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		/** Get inputs */
+		String instructorID = request.getParameter("instructorID");
 		String studentID = request.getParameter("studentID");
-		int configID = Integer.parseInt(request.getParameter("configID"));
 		String department = request.getParameter("department");
 		String number = request.getParameter("number");
-		Registers.register(studentID, department, number, configID);
-		RequestDispatcher req = request.getRequestDispatcher("add.jsp?studentID=" + studentID);
+		int configID = Integer.parseInt(request.getParameter("configID"));
+		Registers.drop(studentID, department, number, configID);
+		RequestDispatcher req = request.getRequestDispatcher(
+				"manageRoster.jsp?studentID=" + studentID + "?department=" + department + "?number=" + number + "?configID=" + configID);
 		req.forward(request, response);
 	}
 
