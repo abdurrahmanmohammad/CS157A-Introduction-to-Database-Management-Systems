@@ -15,7 +15,7 @@
 	String instructorID = request.getParameter("instructorID");
 	if (username == null) username = Users.search(instructorID).get("username");
 	if (instructorID == null) instructorID = Users.getID(username);
-	HashMap<String, String> admin = Members.search(instructorID);
+	HashMap<String, String> instructor = Members.search(instructorID);
 	String status = Instructors.getStatus(instructorID);
 	%>
 	<div class="topnav">
@@ -34,7 +34,9 @@
 	<table class="content-table">
 		<tr>
 			<td>
-				<h2>Welcome Administrator <%out.println(admin.get("firstname") + " " + admin.get("lastname"));out.println("(" + instructorID + ")");%>
+				<h2>Welcome Instructor <%out.println(instructor
+.get("firstname") + " " + instructor
+.get("lastname"));out.println("(" + instructorID + ")");%>
 				</h2>
 			</td>
 		</tr>
