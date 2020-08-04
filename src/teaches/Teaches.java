@@ -264,40 +264,4 @@ public class Teaches {
 		}
 		return output; // Default value: empty list
 	}
-
-	public static ArrayList<HashMap<String, String>> ins_viewAssignedCourses(String instructorID) {
-		ArrayList<HashMap<String, String>> output = new ArrayList<HashMap<String, String>>();
-		/** Check for invalid inputs. If any input is null, return false */
-		if (instructorID == null) return output; // Check if studentID is null, return empty list if so
-		SQLMethods.mysqlConnect(); // Connect to DB
-		try { // Attempt to search
-			/** Search and retrieve tuple */
-			pstate = SQLMethods.con.prepareStatement(
-					"SELECT Courses.department, Courses.number, Courses.title, Courses.units, Configurations. * FROM Instructors join Teaches on Instructors.instructorId = Teaches.instructorId join Courses on Teaches.department = Courses.department AND Courses.number = Teaches.number join Configurations on Configurations.configID = Teaches.configID  WHERE Instructors.instructorID = ? ORDER BY year DESC;");
-			pstate.setString(1, instructorID);
-			result = pstate.executeQuery(); // Execute query
-			/** Extract tuple data */
-			while (result.next()) {
-				HashMap<String, String> tuple = new HashMap<String, String>();
-				tuple.put("term", result.getString("term"));
-				tuple.put("year", result.getString("year"));
-				tuple.put("department", result.getString("department"));
-				tuple.put("number", result.getString("number"));
-				tuple.put("days", result.getString("days"));
-				tuple.put("time", result.getString("time"));
-				tuple.put("room", result.getString("room"));
-				tuple.put("configID", result.getString("configID"));
-				tuple.put("title", result.getString("title"));
-				tuple.put("units", result.getString("units"));
-				tuple.put("seats", result.getString("seats"));
-				output.add(tuple);
-			}
-			result.close(); // Close result
-			SQLMethods.closeConnection(); // Close connection
-			return output; // Return output
-		} catch (SQLException e) { // Print error and terminate program
-			SQLMethods.mysql_fatal_error("Query error: " + e.toString());
-		}
-		return output; // Return false as a default value
-	}
 }
