@@ -53,7 +53,6 @@ public class updateCourse extends HttpServlet {
 		String title = request.getParameter("title");
 		int units = Integer.parseInt(request.getParameter("units"));
 		int cost = Integer.parseInt(request.getParameter("cost"));
-
 		// If new attributes conflict with an existing course, return
 		if (Courses.search(newDept, newNum).size() == 0) {
 			// Update references to the course
